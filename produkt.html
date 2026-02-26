@@ -484,17 +484,15 @@ ${imgHtml}
 }
 
 function goToProduct(slug) {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
   document.body.classList.add('leaving');
   setTimeout(async () => {
     window.location.hash = slug;
-    window.scrollTo({ top: 0 });
     document.body.classList.remove('leaving');
-    // Show loading, hide product
     const wrap = document.getElementById('pdWrap');
     if (wrap) wrap.style.display = 'none';
     const loading = document.getElementById('loadingState');
     if (loading) { loading.style.display = 'flex'; loading.innerHTML = '<div class="loader"></div>'; }
-    // Re-run init
     await init();
     document.body.classList.add('ready');
   }, 250);
