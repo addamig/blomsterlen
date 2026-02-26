@@ -233,11 +233,7 @@ nav{background:rgba(250,247,242,.92);backdrop-filter:blur(20px);border-bottom:1p
       </div>
       <div class="step" data-step="3" onclick="goToStep(3)">
         <div class="step-dot">3</div>
-        <div class="step-label">Betalning</div>
-      </div>
-      <div class="step" data-step="4" onclick="goToStep(4)">
-        <div class="step-dot">4</div>
-        <div class="step-label">Granska</div>
+        <div class="step-label">Granska & Betala</div>
       </div>
     </div>
 
@@ -350,84 +346,18 @@ nav{background:rgba(250,247,242,.92);backdrop-filter:blur(20px);border-bottom:1p
 
       <div class="btn-row">
         <button class="btn-back" onclick="prevStep(2)">← Tillbaka</button>
-        <button class="btn-next" onclick="nextStep(2)">Till betalning →</button>
+        <button class="btn-next" onclick="nextStep(2)">Granska order →</button>
       </div>
     </div>
 
-    <!-- STEP 3: PAYMENT -->
+    <!-- STEP 3: REVIEW & PAY (was step 4) -->
+    <div class="panel" id="panel3">
     <div class="panel" id="panel3">
       <h2 class="section-title">Betalning</h2>
       <p class="section-sub">Alla transaktioner hanteras säkert via krypterad anslutning.</p>
 
-      <div class="pay-methods" id="payMethods">
-        <div class="pay-opt selected" data-pay="klarna" onclick="selectPay(this)">
-          <div class="pay-icon" style="background:#FFB3C7;color:#0A0B09;font-size:12px;font-weight:800">Klarna</div>
-          <div>
-            <div class="pay-name">Klarna</div>
-            <div class="pay-desc">Betala om 30 dagar eller dela upp</div>
-          </div>
-        </div>
-        <div class="pay-opt" data-pay="card" onclick="selectPay(this)">
-          <div class="pay-icon" style="background:linear-gradient(135deg,#1A1F71,#2E77BB);color:white;font-size:9px;font-weight:700">KORT</div>
-          <div>
-            <div class="pay-name">Kort</div>
-            <div class="pay-desc">Visa, Mastercard, American Express</div>
-          </div>
-        </div>
-        <div class="pay-opt" data-pay="swish" onclick="selectPay(this)">
-          <div class="pay-icon" style="background:#52B848;color:white;font-size:10px;font-weight:700">Swish</div>
-          <div>
-            <div class="pay-name">Swish</div>
-            <div class="pay-desc">Betala direkt med mobilen</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card fields (shown for kort) -->
-      <div class="card-fields" id="cardFields">
-        <div class="form-row full">
-          <div class="field">
-            <label>Kortnummer</label>
-            <input type="text" id="cardNum" placeholder="1234 5678 9012 3456" maxlength="19">
-            <div class="err-msg">Ange ett giltigt kortnummer</div>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="field">
-            <label>Utgångsdatum</label>
-            <input type="text" id="cardExp" placeholder="MM / ÅÅ" maxlength="7">
-            <div class="err-msg">Ange utgångsdatum</div>
-          </div>
-          <div class="field">
-            <label>CVC</label>
-            <input type="text" id="cardCvc" placeholder="123" maxlength="4">
-            <div class="err-msg">Ange CVC</div>
-          </div>
-        </div>
-        <div class="form-row full">
-          <div class="field" style="margin-bottom:0">
-            <label>Namn på kort</label>
-            <input type="text" id="cardName" placeholder="ANNA LINDSTRÖM">
-          </div>
-        </div>
-      </div>
-
-      <h3 style="font-family:var(--fd);font-size:20px;font-weight:400;margin:28px 0 12px;color:var(--earth)">Rabattkod</h3>
-      <div class="discount-row">
-        <input type="text" id="discountCode" placeholder="Ange rabattkod">
-        <button class="discount-btn" onclick="applyDiscount()">Tillämpa</button>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn-back" onclick="prevStep(3)">← Tillbaka</button>
-        <button class="btn-next" onclick="nextStep(3)">Granska order →</button>
-      </div>
-    </div>
-
-    <!-- STEP 4: REVIEW -->
-    <div class="panel" id="panel4">
-      <h2 class="section-title">Granska din beställning</h2>
-      <p class="section-sub">Kontrollera att allt stämmer innan du slutför köpet.</p>
+      <h2 class="section-title">Granska & Betala</h2>
+      <p class="section-sub">Kontrollera att allt stämmer. Du skickas till en säker betalningssida.</p>
 
       <!-- Review items -->
       <div class="review-items" id="reviewItems"></div>
@@ -439,9 +369,16 @@ nav{background:rgba(250,247,242,.92);backdrop-filter:blur(20px);border-bottom:1p
           <div class="review-box" id="reviewAddress"></div>
         </div>
         <div class="review-section">
-          <div class="review-label">Leverans & betalning</div>
+          <div class="review-label">Leverans</div>
           <div class="review-box" id="reviewShipPay"></div>
         </div>
+      </div>
+
+      <!-- Discount code -->
+      <h3 style="font-family:var(--fd);font-size:20px;font-weight:400;margin:28px 0 12px;color:var(--earth)">Rabattkod</h3>
+      <div class="discount-row">
+        <input type="text" id="discountCode" placeholder="Ange rabattkod">
+        <button class="discount-btn" onclick="applyDiscount()">Tillämpa</button>
       </div>
 
       <!-- Terms -->
@@ -451,10 +388,25 @@ nav{background:rgba(250,247,242,.92);backdrop-filter:blur(20px);border-bottom:1p
         <div class="terms-text">Jag godkänner Blomsterlens <a href="#">köpvillkor</a>, <a href="#">integritetspolicy</a> och bekräftar att uppgifterna ovan stämmer.</div>
       </label>
 
-      <div class="btn-row">
-        <button class="btn-back" onclick="prevStep(4)">← Tillbaka</button>
-        <button class="btn-next pay" id="payBtn" onclick="placeOrder()" disabled>Slutför beställning →</button>
+      <!-- Payment methods info -->
+      <div style="display:flex;align-items:center;gap:16px;margin:20px 0 8px;padding:20px;background:var(--pl);border-radius:12px">
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="background:#FFB3C7;color:#0A0B09;font-size:10px;font-weight:800;padding:6px 10px;border-radius:6px">Klarna</div>
+          <div style="background:linear-gradient(135deg,#1A1F71,#2E77BB);color:white;font-size:8px;font-weight:700;padding:6px 10px;border-radius:6px">VISA / MC</div>
+        </div>
+        <span style="font-size:13px;color:var(--el)">Välj betalsätt i nästa steg</span>
       </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="prevStep(3)">← Tillbaka</button>
+        <button class="btn-next pay" id="payBtn" onclick="startStripeCheckout()" disabled>
+          <span id="payBtnText">Gå till betalning →</span>
+          <span id="payBtnLoading" style="display:none">Laddar betalning...</span>
+        </button>
+      </div>
+
+      <!-- Error display -->
+      <div id="checkoutError" style="display:none;margin-top:16px;padding:16px;background:rgba(199,91,74,.1);border-radius:12px;color:var(--terra);font-size:14px"></div>
     </div>
   </div>
 
@@ -515,7 +467,6 @@ try { const saved = localStorage.getItem("blomsterlen_cart"); if (saved) cart = 
 if (!cart.length) cart = demoCart; // fallback for demo
 let currentStep = 1;
 let selectedShip = 'standard';
-let selectedPay = 'klarna';
 let discount = 0;
 let discountApplied = false;
 const FREE_SHIP_THRESHOLD = 599;
@@ -592,19 +543,16 @@ function goToStep(step) {
 
 function nextStep(from) {
   if (from === 1 && !validateStep1()) return;
-  if (from === 3 && selectedPay === 'card' && !validateCard()) return;
-  if (from === 4) return; // handled by placeOrder
+  if (from === 3) return; // handled by startStripeCheckout
   currentStep = from + 1;
-  if (currentStep === 4) buildReview();
+  if (currentStep === 3) buildReview();
   updateUI();
-  localStorage.removeItem("blomsterlen_cart");
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function prevStep(from) {
   currentStep = from - 1;
   updateUI();
-  localStorage.removeItem("blomsterlen_cart");
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -619,13 +567,12 @@ function updateUI() {
     const sn = parseInt(s.dataset.step);
     s.classList.toggle('active', sn === currentStep);
     s.classList.toggle('done', sn < currentStep);
-    // Update dot content for done steps
     const dot = s.querySelector('.step-dot');
     dot.textContent = sn < currentStep ? '✓' : sn;
   });
 
-  // Progress track
-  const pct = ((currentStep - 1) / 3) * 100;
+  // Progress track (3 steps now)
+  const pct = ((currentStep - 1) / 2) * 100;
   document.getElementById('progressTrack').style.width = pct + '%';
 
   renderSummary();
@@ -654,24 +601,6 @@ function validateStep1() {
   return ok;
 }
 
-function validateCard() {
-  if (selectedPay !== 'card') return true;
-  const fields = [
-    { id: 'cardNum', test: v => v.replace(/\s/g, '').length >= 13 },
-    { id: 'cardExp', test: v => /\d{2}\s*\/\s*\d{2}/.test(v) },
-    { id: 'cardCvc', test: v => v.length >= 3 },
-  ];
-  let ok = true;
-  fields.forEach(f => {
-    const el = document.getElementById(f.id);
-    const valid = f.test(el.value.trim());
-    el.classList.toggle('error', !valid);
-    if (!valid) ok = false;
-  });
-  if (!ok) notify('Fyll i dina kortuppgifter');
-  return ok;
-}
-
 // Remove error on focus
 document.querySelectorAll('.field input').forEach(inp => {
   inp.addEventListener('focus', () => inp.classList.remove('error'));
@@ -694,14 +623,6 @@ function updateShipPrice() {
     stdEl.textContent = isFree ? 'Fri frakt' : '49 kr';
     stdEl.classList.toggle('free', isFree);
   }
-}
-
-// ── Payment ──
-function selectPay(el) {
-  document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedPay = el.dataset.pay;
-  document.getElementById('cardFields').classList.toggle('visible', selectedPay === 'card');
 }
 
 // ── Discount ──
@@ -758,9 +679,8 @@ function buildReview() {
   `;
 
   const shipNames = { standard: 'Standardfrakt (2–4 dagar)', express: 'Expressfrakt (nästa dag)', pickup: 'Hämta hos ombud (2–3 dagar)' };
-  const payNames = { klarna: 'Klarna — Faktura / Delbetalning', card: 'Kort (Visa/Mastercard)', swish: 'Swish' };
   document.getElementById('reviewShipPay').innerHTML = `
-    <p>${shipNames[selectedShip]}<br>${payNames[selectedPay]}</p>
+    <p>${shipNames[selectedShip]}</p>
     <p class="small">Totalt: ${getTotal()} kr</p>
   `;
 }
@@ -770,60 +690,101 @@ document.getElementById('termsCheck').addEventListener('change', function() {
   document.getElementById('payBtn').disabled = !this.checked;
 });
 
-// ── Place order ──
-function placeOrder() {
+// ── Stripe Checkout ──
+const CHECKOUT_URL = 'https://jymaudfvcfhmjnfxucbk.supabase.co/functions/v1/create-checkout';
+
+async function startStripeCheckout() {
   if (!document.getElementById('termsCheck').checked) return;
 
-  // Hide checkout, show confirmation
-  document.getElementById('checkoutWrap').style.display = 'none';
-  document.getElementById('confirmWrap').style.display = 'block';
+  const btn = document.getElementById('payBtn');
+  const btnText = document.getElementById('payBtnText');
+  const btnLoading = document.getElementById('payBtnLoading');
+  const errEl = document.getElementById('checkoutError');
 
-  const fn = document.getElementById('firstName').value;
-  const ln = document.getElementById('lastName').value;
-  const email = document.getElementById('email').value;
-  const addr = document.getElementById('address').value;
-  const zip = document.getElementById('zip').value;
-  const city = document.getElementById('city').value;
-  const shipNames = { standard: 'Standardfrakt', express: 'Expressfrakt', pickup: 'Ombud' };
-  const payNames = { klarna: 'Klarna', card: 'Kort', swish: 'Swish' };
+  btn.disabled = true;
+  btnText.style.display = 'none';
+  btnLoading.style.display = 'inline';
+  errEl.style.display = 'none';
 
-  // Order ID
-  const oid = 'BL-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(1000 + Math.random() * 9000);
-  document.getElementById('confirmOrderId').textContent = 'ORDER #' + oid;
+  try {
+    const payload = {
+      items: cart.map(c => ({ id: c.id, quantity: c.q, name: c.n })),
+      shipping: {
+        type: selectedShip,
+        note: document.getElementById('shipNote')?.value || '',
+      },
+      customer: {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        zip: document.getElementById('zip').value,
+        city: document.getElementById('city').value,
+      },
+      discount_code: document.getElementById('discountCode')?.value || '',
+    };
 
-  document.getElementById('confirmGrid').innerHTML = `
-    <div class="cg-item"><div class="cg-label">Kund</div><div class="cg-val">${fn} ${ln}<br>${email}</div></div>
-    <div class="cg-item"><div class="cg-label">Leveransadress</div><div class="cg-val">${addr}<br>${zip} ${city}</div></div>
-    <div class="cg-item"><div class="cg-label">Leverans</div><div class="cg-val">${shipNames[selectedShip]}</div></div>
-    <div class="cg-item"><div class="cg-label">Betalning</div><div class="cg-val">${payNames[selectedPay]}</div></div>
-  `;
+    const res = await fetch(CHECKOUT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
 
-  document.getElementById('confirmItems').innerHTML = `
-    ${cart.map(c => `<div class="ci-row"><span>${c.n} <span class="ci-meta">× ${c.q}</span></span><span>${c.p * c.q} kr</span></div>`).join('')}
-    ${discount > 0 ? `<div class="ci-row" style="color:var(--ok)"><span>Rabatt</span><span>−${discount} kr</span></div>` : ''}
-    <div class="ci-row"><span>Frakt</span><span>${getShipCost() === 0 ? 'Fri frakt' : getShipCost() + ' kr'}</span></div>
-    <div class="ci-total"><span>Totalt betalt</span><span>${getTotal()} kr</span></div>
-  `;
+    const data = await res.json();
 
-  localStorage.removeItem("blomsterlen_cart");
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!res.ok || !data.url) {
+      throw new Error(data.error || 'Kunde inte skapa betalningssession');
+    }
+
+    // Redirect to Stripe Checkout
+    window.location.href = data.url;
+
+  } catch (err) {
+    errEl.textContent = err.message || 'Något gick fel. Försök igen.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btnText.style.display = 'inline';
+    btnLoading.style.display = 'none';
+  }
 }
 
-// ── Card formatting ──
-document.getElementById('cardNum').addEventListener('input', function() {
-  let v = this.value.replace(/\D/g, '').slice(0, 16);
-  this.value = v.replace(/(.{4})/g, '$1 ').trim();
-});
-document.getElementById('cardExp').addEventListener('input', function() {
-  let v = this.value.replace(/\D/g, '').slice(0, 4);
-  if (v.length >= 3) v = v.slice(0,2) + ' / ' + v.slice(2);
-  this.value = v;
-});
-document.getElementById('cardCvc').addEventListener('input', function() {
-  this.value = this.value.replace(/\D/g, '').slice(0, 4);
-});
+// ── Handle return from Stripe ──
+function handleStripeReturn() {
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.get('success') === 'true') {
+    // Payment successful — show confirmation
+    document.getElementById('checkoutWrap').style.display = 'none';
+    document.getElementById('confirmWrap').style.display = 'block';
+
+    const sessionId = params.get('session_id') || '';
+    const oid = 'BL-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + sessionId.slice(-4).toUpperCase();
+    document.getElementById('confirmOrderId').textContent = 'ORDER #' + oid;
+
+    document.getElementById('confirmGrid').innerHTML = `
+      <div class="cg-item"><div class="cg-label">Status</div><div class="cg-val" style="color:var(--sd);font-weight:600">✓ Betalning genomförd</div></div>
+      <div class="cg-item"><div class="cg-label">Betalning</div><div class="cg-val">Via Stripe (Klarna / Kort)</div></div>
+    `;
+
+    document.getElementById('confirmItems').innerHTML = `
+      <div class="ci-total"><span>Tack för din beställning!</span></div>
+      <p style="color:var(--el);font-size:14px;margin-top:12px">En orderbekräftelse skickas till din e-post.</p>
+    `;
+
+    localStorage.removeItem("blomsterlen_cart");
+    // Clean URL
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+
+  if (params.get('cancelled') === 'true') {
+    notify('Betalningen avbröts. Du kan försöka igen.');
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+}
 
 // ── Init ──
+handleStripeReturn();
 renderSummary();
 updateUI();
 </script>
