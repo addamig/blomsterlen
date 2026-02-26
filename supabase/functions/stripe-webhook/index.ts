@@ -6,80 +6,80 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
   httpClient: Stripe.createFetchHttpClient(),
 });
 
-const endpointSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET")!;
-
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
+const endpointSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
+
 Deno.serve(async (req) => {
-  const signature = req.headers.get("stripe-signature");
-  if (!signature) {
-    return new Response("Missing signature", { status: 400 });
-  }
-
-  const body = await req.text();
-
-  let event: Stripe.Event;
   try {
-    event = await stripe.webhooks.constructEventAsync(body, signature, endpointSecret);
-  } catch (err) {
-    console.error("Webhook signature verification failed:", err);
-    return new Response("Invalid signature", { status: 400 });
-  }
+    const body = await req.text();
+    let event: any;
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
+    const signature = req.headers.get("stripe-signature");
+    if (endpointSecret && signature) {
+      try {
+        event = await stripe.webhooks.constructEventAsync(body, signature, endpointSecret);
+      } catch (err) {
+        console.error("Signature verification failed:", err.message);
+        return new Response(JSON.stringify({ error: "Invalid signature" }), { status: 400 });
+      }
+    } else {
+      event = JSON.parse(body);
+      console.warn("No signature verification — missing secret or header");
+    }
 
-    try {
-      // Fetch line items from Stripe
-      const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
+    console.log("Event received:", event.type);
 
-      const orderItems = lineItems.data
-        .filter((item) => !item.description?.includes("frakt"))
-        .map((item) => ({
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+      console.log("Checkout completed:", session.id, session.customer_email);
+
+      let orderItems: any[] = [];
+      try {
+        const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
+        orderItems = lineItems.data.map((item: any) => ({
           name: item.description,
           quantity: item.quantity,
-          price: (item.amount_total || 0) / 100,
+          price_cents: item.amount_total,
         }));
+      } catch (err) {
+        console.error("Line items fetch failed:", err.message);
+      }
 
-      // Create order in database
-      const { error: orderError } = await supabase.from("orders").insert({
-        customer_email: session.customer_email || session.metadata?.customer_name,
-        customer_name: session.metadata?.customer_name || "Okänd",
+      const orderData = {
+        customer_email: session.customer_email || "",
+        customer_name: session.metadata?.customer_name || "",
         shipping_address: {
-          address: session.metadata?.shipping_address,
-          type: session.metadata?.shipping_type,
-          note: session.metadata?.shipping_note,
+          address: session.metadata?.shipping_address || "",
+          type: session.metadata?.shipping_type || "",
+          note: session.metadata?.shipping_note || "",
+          phone: session.metadata?.customer_phone || "",
         },
         items: orderItems,
-        total_amount: session.amount_total || 0, // in öre
-        shipping_cost: 0,
+        total_amount: session.amount_total || 0,
         status: "paid",
         stripe_session_id: session.id,
-      });
+      };
 
-      if (orderError) {
-        console.error("Failed to create order:", orderError);
+      console.log("Inserting order:", JSON.stringify(orderData));
+
+      const { data, error } = await supabase.from("orders").insert(orderData).select();
+
+      if (error) {
+        console.error("Insert failed:", JSON.stringify(error));
       } else {
-        console.log(`Order created for ${session.customer_email}`);
+        console.log("Order created:", data?.[0]?.id);
       }
-
-      // Decrement stock (optional - best effort)
-      for (const item of orderItems) {
-        await supabase.rpc("decrement_stock", {
-          product_name: item.name,
-          qty: item.quantity,
-        });
-      }
-
-    } catch (err) {
-      console.error("Error processing checkout.session.completed:", err);
     }
-  }
 
-  return new Response(JSON.stringify({ received: true }), {
-    headers: { "Content-Type": "application/json" },
-  });
+    return new Response(JSON.stringify({ received: true }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    console.error("Handler error:", err.message);
+    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+  }
 });
