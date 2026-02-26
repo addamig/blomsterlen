@@ -350,12 +350,8 @@ nav{background:rgba(250,247,242,.92);backdrop-filter:blur(20px);border-bottom:1p
       </div>
     </div>
 
-    <!-- STEP 3: REVIEW & PAY (was step 4) -->
+    <!-- STEP 3: REVIEW & PAY -->
     <div class="panel" id="panel3">
-    <div class="panel" id="panel3">
-      <h2 class="section-title">Betalning</h2>
-      <p class="section-sub">Alla transaktioner hanteras säkert via krypterad anslutning.</p>
-
       <h2 class="section-title">Granska & Betala</h2>
       <p class="section-sub">Kontrollera att allt stämmer. Du skickas till en säker betalningssida.</p>
 
@@ -509,16 +505,20 @@ function renderSummary() {
 
   count.textContent = getItemCount() + ' artiklar';
 
-  items.innerHTML = cart.map(c => `
+  items.innerHTML = cart.map(c => {
+    const hasImg = c.img;
+    const thumbStyle = hasImg ? `background-image:url(${c.img});background-size:cover;background-position:center` : `background:${gb(c.c)}`;
+    const thumbContent = hasImg ? '' : ge(c.c);
+    return `
     <div class="si-item">
-      <div class="si-thumb" style="background:${gb(c.c)}">${ge(c.c)}</div>
+      <div class="si-thumb" style="${thumbStyle}">${thumbContent}</div>
       <div class="si-details">
         <div class="si-name">${c.n}</div>
         <div class="si-qty">${c.q} st × ${c.p} kr</div>
       </div>
       <div class="si-price">${c.p * c.q} kr</div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 
   const sub = getSubtotal();
   const ship = getShipCost();
@@ -649,9 +649,13 @@ function applyDiscount() {
 // ── Build review ──
 function buildReview() {
   // Items
-  document.getElementById('reviewItems').innerHTML = cart.map(c => `
+  document.getElementById('reviewItems').innerHTML = cart.map(c => {
+    const hasImg = c.img;
+    const thumbStyle = hasImg ? `background-image:url(${c.img});background-size:cover;background-position:center` : `background:${gb(c.c)}`;
+    const thumbContent = hasImg ? '' : ge(c.c);
+    return `
     <div class="review-item">
-      <div class="ri-img" style="background:${gb(c.c)}">${ge(c.c)}</div>
+      <div class="ri-img" style="${thumbStyle}">${thumbContent}</div>
       <div class="ri-info">
         <div class="ri-name">${c.n}</div>
         <div class="ri-latin">${c.l}</div>
@@ -661,8 +665,8 @@ function buildReview() {
         <div class="ri-qty">${c.q} st</div>
         <div class="ri-price">${c.p * c.q} kr</div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 
   // Address
   const fn = document.getElementById('firstName').value;
@@ -790,4 +794,3 @@ updateUI();
 </script>
 </body>
 </html>
-
