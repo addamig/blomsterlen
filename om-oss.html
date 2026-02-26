@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Om oss — Blomsterlen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--cream:#FAF7F2;--sage:#8B9E7E;--sl:#C5D4B8;--sd:#5C6E52;--terra:#C4785B;--tl:#E8A98A;--earth:#3D3229;--el:#6B5D50;--petal:#E8D5C8;--pl:#F3EAE3;--w:#FFFFFF;--moss:#2C3E28;--gold:#B8964E;--blush:#F0D9CC;--fd:'Cormorant Garamond',Georgia,serif;--fb:'DM Sans',system-ui,sans-serif}
+html{scroll-behavior:smooth}body{font-family:var(--fb);background:var(--cream);color:var(--earth);-webkit-font-smoothing:antialiased}
+.ann{background:var(--moss);color:var(--sl);text-align:center;padding:10px 20px;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;font-weight:500}.ann span{color:var(--tl)}
+nav{position:sticky;top:0;z-index:1000;background:rgba(250,247,242,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(139,158,126,.15)}.ni{max-width:1440px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:16px 48px}.nl{display:flex;gap:32px}.nl a{text-decoration:none;color:var(--earth);font-size:13px;letter-spacing:1.5px;text-transform:uppercase;font-weight:500;position:relative;transition:color .3s}.nl a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1.5px;background:var(--sage);transition:width .3s}.nl a:hover::after{width:100%}.nl a:hover{color:var(--sd)}.nl a.active{color:var(--sd)}.nl a.active::after{width:100%}
+.logo{font-family:var(--fd);font-size:32px;font-weight:300;color:var(--earth);letter-spacing:3px;text-decoration:none}.logo em{font-style:italic;color:var(--sage);font-weight:400}
+.na{display:flex;gap:20px;align-items:center}.na a{text-decoration:none;color:var(--earth);font-size:13px;letter-spacing:1.5px;text-transform:uppercase;font-family:var(--fb);font-weight:500;transition:color .3s}.na a:hover{color:var(--sd)}
+.hero-sub{position:relative;padding:100px 48px 80px;text-align:center;background:linear-gradient(135deg,var(--cream),var(--pl) 50%,var(--blush));overflow:hidden}
+.hero-sub::before{content:'';position:absolute;inset:0;opacity:.04;background-image:radial-gradient(circle at 30% 40%,var(--sage) 1px,transparent 1px);background-size:50px 50px}
+.shl{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--sd);font-weight:600;margin-bottom:16px;position:relative}
+.hero-sub h1{font-family:var(--fd);font-size:clamp(40px,5vw,68px);font-weight:300;color:var(--earth);line-height:1.1;margin-bottom:20px;position:relative}
+.hero-sub h1 em{font-style:italic;color:var(--sage)}
+.hero-sub p{font-size:17px;line-height:1.8;color:var(--el);max-width:600px;margin:0 auto;position:relative}
+.content{max-width:1100px;margin:0 auto;padding:80px 48px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.grid2.rev{direction:rtl}.grid2.rev>*{direction:ltr}
+.img-wrap{border-radius:20px;overflow:hidden;aspect-ratio:4/3}.img-wrap img{width:100%;height:100%;object-fit:cover}
+.text-block h2{font-family:var(--fd);font-size:clamp(28px,3.5vw,42px);font-weight:300;color:var(--earth);margin-bottom:20px;line-height:1.15}
+.text-block h2 em{font-style:italic;color:var(--sage)}
+.text-block p{font-size:15px;line-height:1.9;color:var(--el);margin-bottom:16px}
+.values-bar{background:var(--w);padding:80px 48px;border-top:1px solid rgba(139,158,126,.1);border-bottom:1px solid rgba(139,158,126,.1)}
+.values-inner{max-width:1100px;margin:0 auto;text-align:center}
+.sht{font-family:var(--fd);font-size:clamp(32px,4vw,48px);font-weight:300;color:var(--earth);line-height:1.15;margin-bottom:56px}.sht em{font-style:italic;color:var(--sage)}
+.vg{display:grid;grid-template-columns:repeat(3,1fr);gap:36px}
+.vc{padding:36px 28px;text-align:center}
+.vi{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px}
+.vc:nth-child(1) .vi{background:linear-gradient(135deg,var(--sl),var(--sage))}
+.vc:nth-child(2) .vi{background:linear-gradient(135deg,var(--blush),var(--tl))}
+.vc:nth-child(3) .vi{background:linear-gradient(135deg,var(--petal),var(--gold))}
+.vc h3{font-family:var(--fd);font-size:22px;font-weight:500;color:var(--earth);margin-bottom:10px}
+.vc p{font-size:14px;line-height:1.8;color:var(--el)}
+.green-box{max-width:1100px;margin:0 auto;padding:80px 48px}
+.gb{background:var(--moss);border-radius:24px;padding:64px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;position:relative;overflow:hidden}
+.gb::before{content:'';position:absolute;inset:0;opacity:.06;background-image:radial-gradient(circle,white 1px,transparent 1px);background-size:30px 30px}
+.gb-text{position:relative}
+.gb-text h2{font-family:var(--fd);font-size:clamp(28px,3vw,40px);font-weight:300;color:var(--cream);margin-bottom:20px;line-height:1.15}
+.gb-text h2 em{color:var(--sl);font-style:italic}
+.gb-text p{font-size:14px;line-height:1.9;color:rgba(197,212,184,.85);margin-bottom:14px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:24px;position:relative}
+.stat{text-align:center;padding:28px 20px;background:rgba(255,255,255,.08);border-radius:16px}
+.stat-n{font-family:var(--fd);font-size:36px;font-weight:400;color:var(--sl);margin-bottom:4px}
+.stat-l{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(197,212,184,.7)}
+.cta-sec{text-align:center;padding:80px 48px 100px}
+.cta-sec h2{font-family:var(--fd);font-size:clamp(28px,3vw,42px);font-weight:300;color:var(--earth);margin-bottom:16px}
+.cta-sec h2 em{font-style:italic;color:var(--sage)}
+.cta-sec p{font-size:15px;color:var(--el);margin-bottom:32px}
+.bp{display:inline-flex;align-items:center;gap:10px;padding:16px 36px;background:var(--earth);color:var(--cream);border:none;font-family:var(--fb);font-size:13px;letter-spacing:2px;text-transform:uppercase;font-weight:500;transition:all .4s;text-decoration:none}.bp:hover{background:var(--sd);transform:translateY(-2px);box-shadow:0 8px 24px rgba(92,110,82,.25)}
+footer{background:var(--earth);color:rgba(250,247,242,.7);padding:64px 48px 36px}.fti{max-width:1440px;margin:0 auto}.ftt{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;padding-bottom:40px;border-bottom:1px solid rgba(250,247,242,.1)}.ftb .logo{font-size:26px;display:inline-block;margin-bottom:14px;color:var(--cream)}.ftb p{font-size:13px;line-height:1.7;max-width:280px;color:rgba(250,247,242,.5)}.fc h4{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cream);font-weight:600;margin-bottom:18px}.fc a{display:block;color:rgba(250,247,242,.5);text-decoration:none;font-size:13px;margin-bottom:10px;transition:color .3s}.fc a:hover{color:var(--sl)}.ftbo{padding-top:28px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:rgba(250,247,242,.35)}.fps{display:flex;gap:10px}.fps span{padding:5px 12px;border-radius:6px;border:1px solid rgba(250,247,242,.15);font-size:11px;font-weight:500;color:rgba(250,247,242,.4)}
+@keyframes fu{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.fade{opacity:0;transform:translateY(30px);transition:all .7s ease}.fade.vis{opacity:1;transform:translateY(0)}
+@media(max-width:1024px){.grid2,.grid2.rev{grid-template-columns:1fr;direction:ltr;gap:40px}.gb{grid-template-columns:1fr}.vg{grid-template-columns:1fr}.ftt{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){.ni{padding:14px 20px}.nl{display:none}.hero-sub{padding:60px 20px 50px}.content,.values-bar,.green-box,.cta-sec{padding-left:20px;padding-right:20px}.gb{padding:36px 24px}footer{padding:40px 20px 28px}.ftt{grid-template-columns:1fr;gap:28px}.ftbo{flex-direction:column;gap:14px;text-align:center}}
+</style>
+</head>
+<body>
+<div class="ann">Fri frakt på beställningar över 599 kr — <span>Växter från utvalda svenska odlare</span></div>
+<nav><div class="ni">
+<div class="nl"><a href="index.html#categories">Kategorier</a><a href="index.html#products">Alla växter</a><a href="om-oss.html" class="active">Om oss</a><a href="kundservice.html">Kundservice</a></div>
+<a href="index.html" class="logo">Blomster<em>len</em></a>
+<div class="na"><a href="index.html#products">Handla</a></div>
+</div></nav>
+
+<section class="hero-sub"><div class="shl">Om Blomsterlen</div><h1>Från <em>Lackalänga</em><br>till din trädgård</h1><p>Vi tror att varje trädgård förtjänar växter som odlats med omsorg. Blomsterlen förmedlar handplockade perenner, prydnadsgräs, ormbunkar och kryddväxter — direkt från svenska odlare till dig.</p></section>
+
+<section class="content fade"><div class="grid2">
+<div class="img-wrap"><img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&h=450&fit=crop&auto=format" alt="Trädgård i Skåne"></div>
+<div class="text-block"><h2>Vår <em>historia</em></h2><p>Blomsterlen växte fram ur en kärlek till perenner och en frustration över att det var svårt att hitta kvalitetsväxter online. Vi ville skapa en plats där trädgårdsälskare kunde hitta precis rätt växt — med tydlig information om ljus, jord och skötsel.</p><p>Idag samarbetar vi med Lackalänga Trädgård i Skåne, en av Sveriges mest kunniga perennodlare, för att erbjuda ett sortiment som sträcker sig från klassiska favoriter till ovanliga rariteter.</p></div>
+</div></section>
+
+<section class="values-bar fade"><div class="values-inner"><div class="shl" style="text-align:center">Våra värderingar</div><h2 class="sht" style="text-align:center">Det vi <em>tror</em> på</h2>
+<div class="vg">
+<div class="vc"><div class="vi">🌱</div><h3>Kvalitet först</h3><p>Varje växt vi säljer har valts ut för sin härdighet, skönhet och tillförlitlighet i svenska trädgårdar. Vi säljer aldrig en växt vi inte själva skulle plantera.</p></div>
+<div class="vc"><div class="vi">🤝</div><h3>Nära odlaren</h3><p>Genom att arbeta direkt med odlare kan vi garantera fräschhet och spårbarhet. Dina växter skickas direkt från odlaren — inte via mellanlager.</p></div>
+<div class="vc"><div class="vi">🌍</div><h3>Hållbart alltid</h3><p>Svenskodlade växter innebär kortare transporter, lokal kunskap och växter anpassade för vårt klimat. Det är bra för trädgården och planeten.</p></div>
+</div></div></section>
+
+<section class="content fade"><div class="grid2 rev">
+<div class="img-wrap"><img src="https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=600&h=450&fit=crop&auto=format" alt="Odling"></div>
+<div class="text-block"><h2>Lackalänga <em>Trädgård</em></h2><p>Vår huvudsakliga odlarpartner, Lackalänga Trädgård, ligger i hjärtat av Skåne. Med decenniers erfarenhet av perennodling förenar de traditionellt kunnande med modern odlingsteknik.</p><p>Resultatet? Starka, välrotade plantor som etablerar sig snabbt i din trädgård. Varje planta odlas i rätt substrat, med rätt näring och under kontrollerade förhållanden.</p></div>
+</div></section>
+
+<section class="green-box fade" id="hallbarhet"><div class="gb">
+<div class="gb-text"><h2>Vårt <em>hållbarhets</em>löfte</h2><p>Vi arbetar aktivt för att minimera vår miljöpåverkan. Alla förpackningar är återvinningsbara, vi använder fossilfri frakt där det är möjligt, och våra odlare använder integrerat växtskydd.</p><p>Vi stödjer också biologisk mångfald genom att inkludera pollinerarvänliga växter i vårt sortiment och uppmuntra kunderna att skapa trädgårdar som gynnar bin, fjärilar och andra insekter.</p></div>
+<div class="stats"><div class="stat"><div class="stat-n">100%</div><div class="stat-l">Svenskodlat</div></div><div class="stat"><div class="stat-n">♻️</div><div class="stat-l">Återvinningsbart</div></div><div class="stat"><div class="stat-n">🐝</div><div class="stat-l">Pollinerarvänligt</div></div><div class="stat"><div class="stat-n">🌿</div><div class="stat-l">Integrerat växtskydd</div></div></div>
+</div></section>
+
+<section class="cta-sec fade"><h2>Redo att hitta dina <em>nya favoriter</em>?</h2><p>Utforska vårt sortiment av perenner, prydnadsgräs, ormbunkar och kryddväxter.</p><a href="index.html#products" class="bp">Handla växter →</a></section>
+
+<footer><div class="fti"><div class="ftt">
+<div class="ftb"><a href="index.html" class="logo">Blomster<em>len</em></a><p>Handplockade perenner, gräs, ormbunkar och kryddväxter från utvalda svenska odlare.</p></div>
+<div class="fc"><h4>Kategorier</h4><a href="index.html#products">Perenner</a><a href="index.html#products">Prydnadsgräs</a><a href="index.html#products">Ormbunkar</a><a href="index.html#products">Kryddväxter</a></div>
+<div class="fc"><h4>Kundservice</h4><a href="kundservice.html">Kontakta oss</a><a href="kundservice.html#frakt">Frakt</a><a href="kundservice.html#returer">Returer</a><a href="kundservice.html#faq">FAQ</a></div>
+<div class="fc"><h4>Om oss</h4><a href="om-oss.html">Om Blomsterlen</a><a href="om-oss.html#hallbarhet">Hållbarhet</a></div>
+</div><div class="ftbo"><span>© 2026 Blomsterlen AB</span><div class="fps"><span>Visa</span><span>Mastercard</span><span>Klarna</span><span>Swish</span></div></div></div></footer>
+
+<script>const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis')})},{threshold:.1});document.querySelectorAll('.fade').forEach(el=>obs.observe(el));</script>
+</body>
+</html>

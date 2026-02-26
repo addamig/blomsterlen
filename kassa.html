@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blomsterlen — Kassa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--cream:#FAF7F2;--sage:#8B9E7E;--sl:#C5D4B8;--sd:#5C6E52;--terra:#C4785B;--tl:#E8A98A;--earth:#3D3229;--el:#6B5D50;--petal:#E8D5C8;--pl:#F3EAE3;--w:#FFFFFF;--moss:#2C3E28;--gold:#B8964E;--blush:#F0D9CC;--fd:'Cormorant Garamond',Georgia,serif;--fb:'DM Sans',system-ui,sans-serif;--err:#C75B4A;--ok:#5C8A4D}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--cream);color:var(--earth);-webkit-font-smoothing:antialiased;min-height:100vh}
+
+/* ── NAV ── */
+nav{background:rgba(250,247,242,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(139,158,126,.15);position:sticky;top:0;z-index:100}
+.ni{max-width:1440px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:16px 48px}
+.logo{font-family:var(--fd);font-size:32px;font-weight:300;color:var(--earth);letter-spacing:3px;text-decoration:none}.logo em{font-style:italic;color:var(--sage);font-weight:400}
+.nav-back{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--el);font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500;transition:color .3s}.nav-back:hover{color:var(--sd)}
+.nav-secure{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sage);letter-spacing:1px;font-weight:500}
+
+/* ── LAYOUT ── */
+.checkout-wrap{max-width:1240px;margin:0 auto;padding:40px 48px 100px;display:grid;grid-template-columns:1fr 420px;gap:60px;align-items:start}
+
+/* ── PROGRESS ── */
+.progress{display:flex;align-items:center;gap:0;margin-bottom:44px;position:relative}
+.progress::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:var(--pl);transform:translateY(-50%);z-index:0}
+.progress .track{position:absolute;top:50%;left:0;height:2px;background:var(--sage);transform:translateY(-50%);z-index:1;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.step{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;position:relative;z-index:2;cursor:pointer}
+.step-dot{width:36px;height:36px;border-radius:50%;background:var(--w);border:2px solid var(--pl);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--el);transition:all .4s}
+.step.active .step-dot{border-color:var(--sage);background:var(--sage);color:white;box-shadow:0 4px 16px rgba(139,158,126,.35)}
+.step.done .step-dot{border-color:var(--sd);background:var(--sd);color:white}
+.step-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--el);font-weight:500;transition:color .3s;white-space:nowrap}
+.step.active .step-label,.step.done .step-label{color:var(--earth)}
+
+/* ── PANELS ── */
+.panel{display:none;animation:panelIn .5s ease forwards}
+.panel.active{display:block}
+@keyframes panelIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.section-title{font-family:var(--fd);font-size:28px;font-weight:400;color:var(--earth);margin-bottom:6px}
+.section-sub{font-size:13px;color:var(--el);margin-bottom:32px;line-height:1.7}
+
+/* ── FORMS ── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:0}
+.form-row.full{grid-template-columns:1fr}
+.field{margin-bottom:20px;position:relative}
+.field label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--el);font-weight:600;margin-bottom:8px}
+.field input,.field select{width:100%;padding:14px 16px;border:1.5px solid rgba(139,158,126,.25);border-radius:10px;font-family:var(--fb);font-size:14px;color:var(--earth);background:var(--w);transition:all .3s;outline:none;appearance:none}
+.field input:focus,.field select:focus{border-color:var(--sage);box-shadow:0 0 0 3px rgba(139,158,126,.12)}
+.field input.error{border-color:var(--err);box-shadow:0 0 0 3px rgba(199,91,74,.1)}
+.field .err-msg{font-size:11px;color:var(--err);margin-top:5px;display:none}
+.field input.error ~ .err-msg{display:block}
+.field select{padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%233D3229' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;cursor:pointer}
+.field .optional{font-size:10px;color:var(--sage);font-weight:400;text-transform:none;letter-spacing:0;margin-left:6px}
+
+/* ── SHIPPING OPTIONS ── */
+.shipping-options{display:flex;flex-direction:column;gap:12px;margin-bottom:28px}
+.ship-opt{display:flex;align-items:center;gap:16px;padding:18px 20px;border:1.5px solid rgba(139,158,126,.2);border-radius:12px;cursor:pointer;transition:all .3s;background:var(--w)}
+.ship-opt:hover{border-color:var(--sage)}
+.ship-opt.selected{border-color:var(--sage);background:rgba(139,158,126,.06);box-shadow:0 2px 12px rgba(139,158,126,.1)}
+.ship-radio{width:20px;height:20px;border-radius:50%;border:2px solid rgba(139,158,126,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s}
+.ship-opt.selected .ship-radio{border-color:var(--sage)}
+.ship-radio::after{content:'';width:10px;height:10px;border-radius:50%;background:var(--sage);transform:scale(0);transition:transform .3s}
+.ship-opt.selected .ship-radio::after{transform:scale(1)}
+.ship-info{flex:1}
+.ship-name{font-size:14px;font-weight:500;color:var(--earth);margin-bottom:2px}
+.ship-desc{font-size:12px;color:var(--el)}
+.ship-price{font-size:14px;font-weight:600;color:var(--earth);white-space:nowrap}
+.ship-price.free{color:var(--ok);font-weight:600}
+
+/* ── PAYMENT ── */
+.pay-methods{display:flex;flex-direction:column;gap:12px;margin-bottom:28px}
+.pay-opt{display:flex;align-items:center;gap:16px;padding:18px 20px;border:1.5px solid rgba(139,158,126,.2);border-radius:12px;cursor:pointer;transition:all .3s;background:var(--w)}
+.pay-opt:hover{border-color:var(--sage)}
+.pay-opt.selected{border-color:var(--sage);background:rgba(139,158,126,.06);box-shadow:0 2px 12px rgba(139,158,126,.1)}
+.pay-icon{width:48px;height:32px;border-radius:6px;background:var(--pl);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--el);flex-shrink:0;letter-spacing:.5px;overflow:hidden}
+.pay-icon img{width:100%;height:100%;object-fit:contain}
+.pay-name{font-size:14px;font-weight:500;color:var(--earth)}
+.pay-desc{font-size:12px;color:var(--el);margin-top:1px}
+
+.card-fields{display:none;margin-top:20px;padding:24px;background:var(--w);border:1.5px solid rgba(139,158,126,.15);border-radius:12px}
+.card-fields.visible{display:block;animation:panelIn .4s ease forwards}
+
+/* ── DISCOUNT ── */
+.discount-row{display:flex;gap:10px;margin-bottom:28px}
+.discount-row input{flex:1;padding:12px 16px;border:1.5px solid rgba(139,158,126,.25);border-radius:10px;font-family:var(--fb);font-size:13px;color:var(--earth);background:var(--w);outline:none}
+.discount-row input:focus{border-color:var(--sage);box-shadow:0 0 0 3px rgba(139,158,126,.12)}
+.discount-btn{padding:12px 24px;background:var(--earth);color:var(--cream);border:none;border-radius:10px;font-family:var(--fb);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;cursor:pointer;transition:all .3s;white-space:nowrap}
+.discount-btn:hover{background:var(--sd)}
+
+/* ── REVIEW ITEMS ── */
+.review-items{margin-bottom:32px}
+.review-item{display:flex;gap:16px;padding:20px 0;border-bottom:1px solid rgba(139,158,126,.1)}
+.review-item:last-child{border-bottom:none}
+.ri-img{width:72px;height:90px;border-radius:10px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:32px}
+.ri-info{flex:1;display:flex;flex-direction:column;justify-content:center}
+.ri-name{font-family:var(--fd);font-size:17px;font-weight:500;color:var(--earth);margin-bottom:2px}
+.ri-latin{font-size:11px;font-style:italic;color:var(--el);margin-bottom:6px}
+.ri-meta{font-size:11px;color:var(--sage);font-weight:500}
+.ri-right{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:8px}
+.ri-qty{font-size:12px;color:var(--el)}
+.ri-price{font-size:15px;font-weight:600;color:var(--earth)}
+
+.review-section{margin-bottom:28px}
+.review-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--sage);font-weight:600;margin-bottom:12px}
+.review-box{background:var(--w);border-radius:12px;padding:20px;border:1px solid rgba(139,158,126,.1)}
+.review-box p{font-size:14px;color:var(--earth);line-height:1.7}
+.review-box .small{font-size:12px;color:var(--el);margin-top:4px}
+
+/* ── TERMS ── */
+.terms-check{display:flex;align-items:flex-start;gap:12px;margin-bottom:28px;cursor:pointer}
+.terms-check input{display:none}
+.check-box{width:22px;height:22px;border-radius:6px;border:1.5px solid rgba(139,158,126,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s;margin-top:1px}
+.terms-check input:checked ~ .check-box{background:var(--sage);border-color:var(--sage)}
+.check-box::after{content:'✓';color:white;font-size:13px;font-weight:700;opacity:0;transition:opacity .2s}
+.terms-check input:checked ~ .check-box::after{opacity:1}
+.terms-text{font-size:13px;color:var(--el);line-height:1.6}
+.terms-text a{color:var(--sd);text-decoration:underline}
+
+/* ── BUTTONS ── */
+.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:36px;padding-top:28px;border-top:1px solid rgba(139,158,126,.1)}
+.btn-back{display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--el);font-family:var(--fb);font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500;cursor:pointer;transition:color .3s;padding:12px 0}
+.btn-back:hover{color:var(--earth)}
+.btn-next{display:inline-flex;align-items:center;gap:10px;padding:16px 40px;background:var(--earth);color:var(--cream);border:none;cursor:pointer;font-family:var(--fb);font-size:13px;letter-spacing:2px;text-transform:uppercase;font-weight:500;transition:all .4s;border-radius:4px}
+.btn-next:hover{background:var(--sd);transform:translateY(-2px);box-shadow:0 8px 24px rgba(92,110,82,.25)}
+.btn-next:disabled{opacity:.4;pointer-events:none}
+.btn-next.pay{background:var(--moss);padding:18px 48px;font-size:14px}
+.btn-next.pay:hover{background:var(--sd)}
+
+/* ── ORDER SUMMARY SIDEBAR ── */
+.summary{position:sticky;top:100px}
+.summary-card{background:var(--w);border-radius:20px;border:1px solid rgba(139,158,126,.1);overflow:hidden}
+.summary-header{padding:24px 28px;border-bottom:1px solid rgba(139,158,126,.1)}
+.summary-header h3{font-family:var(--fd);font-size:22px;font-weight:400;color:var(--earth);display:flex;justify-content:space-between;align-items:center}
+.summary-header .item-count{font-size:12px;font-weight:500;font-family:var(--fb);color:var(--sage);letter-spacing:1px}
+.summary-items{max-height:320px;overflow-y:auto;padding:8px 28px}
+.si-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid rgba(139,158,126,.06)}
+.si-item:last-child{border-bottom:none}
+.si-thumb{width:52px;height:64px;border-radius:8px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px}
+.si-details{flex:1;min-width:0}
+.si-name{font-size:13px;font-weight:500;color:var(--earth);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.si-qty{font-size:11px;color:var(--el);margin-top:2px}
+.si-price{font-size:13px;font-weight:600;color:var(--earth);white-space:nowrap;align-self:center}
+.summary-totals{padding:20px 28px;border-top:1px solid rgba(139,158,126,.1)}
+.stl{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:13px;color:var(--el)}
+.stl .val{color:var(--earth);font-weight:500}
+.stl.discount .val{color:var(--ok);font-weight:600}
+.stl.ship .val.free{color:var(--ok);font-weight:600}
+.st-total{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid rgba(139,158,126,.15);margin-top:10px}
+.st-total span:first-child{font-family:var(--fd);font-size:18px;font-weight:500;color:var(--earth)}
+.st-total .total-price{font-size:22px;font-weight:700;color:var(--earth)}
+
+.summary-trust{padding:20px 28px;border-top:1px solid rgba(139,158,126,.08);display:flex;flex-direction:column;gap:10px}
+.trust-item{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--el)}
+.trust-icon{width:28px;height:28px;border-radius:8px;background:var(--pl);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+
+/* ── CONFIRMATION ── */
+.confirm-wrap{max-width:680px;margin:60px auto;padding:0 48px;text-align:center;animation:panelIn .6s ease forwards}
+.confirm-icon{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--sl),var(--sage));display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 28px;box-shadow:0 12px 40px rgba(139,158,126,.3);animation:popIn .6s cubic-bezier(.175,.885,.32,1.275) forwards .2s;opacity:0}
+@keyframes popIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+.confirm-title{font-family:var(--fd);font-size:clamp(32px,4vw,48px);font-weight:300;color:var(--earth);margin-bottom:8px}
+.confirm-title em{font-style:italic;color:var(--sage)}
+.confirm-sub{font-size:15px;color:var(--el);margin-bottom:8px}
+.confirm-order-id{font-size:13px;color:var(--sage);font-weight:600;letter-spacing:2px;margin-bottom:40px}
+.confirm-card{background:var(--w);border-radius:20px;padding:36px;border:1px solid rgba(139,158,126,.1);text-align:left;margin-bottom:28px}
+.confirm-card h4{font-family:var(--fd);font-size:18px;font-weight:500;margin-bottom:18px;color:var(--earth)}
+.confirm-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.cg-item{font-size:13px}
+.cg-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sage);font-weight:600;margin-bottom:4px}
+.cg-val{color:var(--earth);line-height:1.6}
+
+.confirm-items{margin-top:28px;padding-top:24px;border-top:1px solid rgba(139,158,126,.1)}
+.ci-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:13px;color:var(--earth)}
+.ci-row .ci-meta{color:var(--el);font-size:12px;margin-left:6px}
+.ci-total{display:flex;justify-content:space-between;align-items:center;padding-top:14px;margin-top:10px;border-top:1px solid rgba(139,158,126,.15);font-size:16px;font-weight:600}
+
+.confirm-actions{display:flex;gap:16px;justify-content:center;margin-top:36px}
+.btn-primary{display:inline-flex;align-items:center;gap:10px;padding:16px 36px;background:var(--earth);color:var(--cream);border:none;cursor:pointer;font-family:var(--fb);font-size:13px;letter-spacing:2px;text-transform:uppercase;font-weight:500;transition:all .4s;border-radius:4px;text-decoration:none}
+.btn-primary:hover{background:var(--sd);transform:translateY(-2px);box-shadow:0 8px 24px rgba(92,110,82,.25)}
+.btn-secondary{display:inline-flex;align-items:center;gap:10px;padding:16px 36px;background:transparent;color:var(--earth);border:1.5px solid var(--earth);cursor:pointer;font-family:var(--fb);font-size:13px;letter-spacing:2px;text-transform:uppercase;font-weight:500;transition:all .4s;border-radius:4px;text-decoration:none}
+.btn-secondary:hover{background:var(--earth);color:var(--cream)}
+
+/* ── NOTIFICATION ── */
+.notif{position:fixed;bottom:30px;right:30px;background:var(--earth);color:var(--cream);padding:14px 24px;border-radius:12px;font-size:13px;display:flex;align-items:center;gap:10px;z-index:3000;transform:translateY(120px);opacity:0;transition:all .4s;box-shadow:0 8px 32px rgba(61,50,41,.25)}.notif.show{transform:translateY(0);opacity:1}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1024px){
+  .checkout-wrap{grid-template-columns:1fr;gap:40px;padding:32px 48px 80px}
+  .summary{position:relative;top:0;order:-1}
+  .summary-items{max-height:200px}
+}
+@media(max-width:768px){
+  .ni{padding:14px 20px}
+  .checkout-wrap{padding:24px 20px 80px}
+  .form-row{grid-template-columns:1fr}
+  .confirm-wrap{padding:0 20px}
+  .confirm-grid{grid-template-columns:1fr}
+  .confirm-actions{flex-direction:column}
+  .confirm-actions a,.confirm-actions button{width:100%;justify-content:center}
+  .logo{font-size:26px}
+  .progress{gap:0;margin-bottom:32px}
+  .step-label{font-size:9px;letter-spacing:1px}
+  .step-dot{width:30px;height:30px;font-size:11px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="ni">
+    <a href="index.html" class="nav-back">← Tillbaka till butiken</a>
+    <a href="index.html" class="logo">Blomster<em>len</em></a>
+    <div class="nav-secure">🔒 Säker betalning</div>
+  </div>
+</nav>
+
+<!-- CHECKOUT MAIN -->
+<div class="checkout-wrap" id="checkoutWrap">
+  <div class="main-col">
+
+    <!-- PROGRESS -->
+    <div class="progress" id="progress">
+      <div class="track" id="progressTrack" style="width:0%"></div>
+      <div class="step active" data-step="1" onclick="goToStep(1)">
+        <div class="step-dot">1</div>
+        <div class="step-label">Uppgifter</div>
+      </div>
+      <div class="step" data-step="2" onclick="goToStep(2)">
+        <div class="step-dot">2</div>
+        <div class="step-label">Leverans</div>
+      </div>
+      <div class="step" data-step="3" onclick="goToStep(3)">
+        <div class="step-dot">3</div>
+        <div class="step-label">Betalning</div>
+      </div>
+      <div class="step" data-step="4" onclick="goToStep(4)">
+        <div class="step-dot">4</div>
+        <div class="step-label">Granska</div>
+      </div>
+    </div>
+
+    <!-- STEP 1: DETAILS -->
+    <div class="panel active" id="panel1">
+      <h2 class="section-title">Dina uppgifter</h2>
+      <p class="section-sub">Fyll i dina kontakt- och leveransuppgifter.</p>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Förnamn</label>
+          <input type="text" id="firstName" placeholder="Anna" required>
+          <div class="err-msg">Ange ditt förnamn</div>
+        </div>
+        <div class="field">
+          <label>Efternamn</label>
+          <input type="text" id="lastName" placeholder="Lindström" required>
+          <div class="err-msg">Ange ditt efternamn</div>
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="field">
+          <label>E-post</label>
+          <input type="email" id="email" placeholder="anna@example.se" required>
+          <div class="err-msg">Ange en giltig e-postadress</div>
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="field">
+          <label>Telefon</label>
+          <input type="tel" id="phone" placeholder="070 123 45 67" required>
+          <div class="err-msg">Ange ditt telefonnummer</div>
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="field">
+          <label>Adress</label>
+          <input type="text" id="address" placeholder="Trädgårdsvägen 12" required>
+          <div class="err-msg">Ange din adress</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Postnummer</label>
+          <input type="text" id="zip" placeholder="123 45" required>
+          <div class="err-msg">Ange ditt postnummer</div>
+        </div>
+        <div class="field">
+          <label>Ort</label>
+          <input type="text" id="city" placeholder="Lund" required>
+          <div class="err-msg">Ange din ort</div>
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="field">
+          <label>Portkod / övrigt <span class="optional">(valfritt)</span></label>
+          <input type="text" id="extra" placeholder="Portkod, c/o, etc.">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <div></div>
+        <button class="btn-next" onclick="nextStep(1)">Till leverans →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: SHIPPING -->
+    <div class="panel" id="panel2">
+      <h2 class="section-title">Leveransalternativ</h2>
+      <p class="section-sub">Alla växter skickas i specialemballage för levande växter.</p>
+
+      <div class="shipping-options" id="shipOptions">
+        <div class="ship-opt selected" data-ship="standard" onclick="selectShip(this)">
+          <div class="ship-radio"></div>
+          <div class="ship-info">
+            <div class="ship-name">Standardfrakt</div>
+            <div class="ship-desc">PostNord Hemleverans — 2–4 arbetsdagar</div>
+          </div>
+          <div class="ship-price" id="shipStdPrice">49 kr</div>
+        </div>
+        <div class="ship-opt" data-ship="express" onclick="selectShip(this)">
+          <div class="ship-radio"></div>
+          <div class="ship-info">
+            <div class="ship-name">Expressfrakt</div>
+            <div class="ship-desc">Hemleverans nästa arbetsdag, beställ före 14:00</div>
+          </div>
+          <div class="ship-price">99 kr</div>
+        </div>
+        <div class="ship-opt" data-ship="pickup" onclick="selectShip(this)">
+          <div class="ship-radio"></div>
+          <div class="ship-info">
+            <div class="ship-name">Hämta hos ombud</div>
+            <div class="ship-desc">PostNord serviceställe — 2–3 arbetsdagar</div>
+          </div>
+          <div class="ship-price">39 kr</div>
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="field">
+          <label>Leveransmeddelande <span class="optional">(valfritt)</span></label>
+          <input type="text" id="shipNote" placeholder="T.ex. ställ vid dörren, ring på leverans">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="prevStep(2)">← Tillbaka</button>
+        <button class="btn-next" onclick="nextStep(2)">Till betalning →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: PAYMENT -->
+    <div class="panel" id="panel3">
+      <h2 class="section-title">Betalning</h2>
+      <p class="section-sub">Alla transaktioner hanteras säkert via krypterad anslutning.</p>
+
+      <div class="pay-methods" id="payMethods">
+        <div class="pay-opt selected" data-pay="klarna" onclick="selectPay(this)">
+          <div class="pay-icon" style="background:#FFB3C7;color:#0A0B09;font-size:12px;font-weight:800">Klarna</div>
+          <div>
+            <div class="pay-name">Klarna</div>
+            <div class="pay-desc">Betala om 30 dagar eller dela upp</div>
+          </div>
+        </div>
+        <div class="pay-opt" data-pay="card" onclick="selectPay(this)">
+          <div class="pay-icon" style="background:linear-gradient(135deg,#1A1F71,#2E77BB);color:white;font-size:9px;font-weight:700">KORT</div>
+          <div>
+            <div class="pay-name">Kort</div>
+            <div class="pay-desc">Visa, Mastercard, American Express</div>
+          </div>
+        </div>
+        <div class="pay-opt" data-pay="swish" onclick="selectPay(this)">
+          <div class="pay-icon" style="background:#52B848;color:white;font-size:10px;font-weight:700">Swish</div>
+          <div>
+            <div class="pay-name">Swish</div>
+            <div class="pay-desc">Betala direkt med mobilen</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card fields (shown for kort) -->
+      <div class="card-fields" id="cardFields">
+        <div class="form-row full">
+          <div class="field">
+            <label>Kortnummer</label>
+            <input type="text" id="cardNum" placeholder="1234 5678 9012 3456" maxlength="19">
+            <div class="err-msg">Ange ett giltigt kortnummer</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Utgångsdatum</label>
+            <input type="text" id="cardExp" placeholder="MM / ÅÅ" maxlength="7">
+            <div class="err-msg">Ange utgångsdatum</div>
+          </div>
+          <div class="field">
+            <label>CVC</label>
+            <input type="text" id="cardCvc" placeholder="123" maxlength="4">
+            <div class="err-msg">Ange CVC</div>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="field" style="margin-bottom:0">
+            <label>Namn på kort</label>
+            <input type="text" id="cardName" placeholder="ANNA LINDSTRÖM">
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-family:var(--fd);font-size:20px;font-weight:400;margin:28px 0 12px;color:var(--earth)">Rabattkod</h3>
+      <div class="discount-row">
+        <input type="text" id="discountCode" placeholder="Ange rabattkod">
+        <button class="discount-btn" onclick="applyDiscount()">Tillämpa</button>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="prevStep(3)">← Tillbaka</button>
+        <button class="btn-next" onclick="nextStep(3)">Granska order →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: REVIEW -->
+    <div class="panel" id="panel4">
+      <h2 class="section-title">Granska din beställning</h2>
+      <p class="section-sub">Kontrollera att allt stämmer innan du slutför köpet.</p>
+
+      <!-- Review items -->
+      <div class="review-items" id="reviewItems"></div>
+
+      <!-- Address & shipping summary -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px">
+        <div class="review-section">
+          <div class="review-label">Leveransadress</div>
+          <div class="review-box" id="reviewAddress"></div>
+        </div>
+        <div class="review-section">
+          <div class="review-label">Leverans & betalning</div>
+          <div class="review-box" id="reviewShipPay"></div>
+        </div>
+      </div>
+
+      <!-- Terms -->
+      <label class="terms-check" id="termsLabel">
+        <input type="checkbox" id="termsCheck">
+        <div class="check-box"></div>
+        <div class="terms-text">Jag godkänner Blomsterlens <a href="#">köpvillkor</a>, <a href="#">integritetspolicy</a> och bekräftar att uppgifterna ovan stämmer.</div>
+      </label>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="prevStep(4)">← Tillbaka</button>
+        <button class="btn-next pay" id="payBtn" onclick="placeOrder()" disabled>Slutför beställning →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDER SUMMARY SIDEBAR -->
+  <div class="summary">
+    <div class="summary-card">
+      <div class="summary-header">
+        <h3>Din order <span class="item-count" id="summaryCount"></span></h3>
+      </div>
+      <div class="summary-items" id="summaryItems"></div>
+      <div class="summary-totals" id="summaryTotals"></div>
+      <div class="summary-trust">
+        <div class="trust-item"><div class="trust-icon">🌱</div> Alla växter fräschhetsgaranterade</div>
+        <div class="trust-item"><div class="trust-icon">📦</div> Specialemballage för levande växter</div>
+        <div class="trust-item"><div class="trust-icon">🔄</div> 14 dagars öppet köp</div>
+        <div class="trust-item"><div class="trust-icon">🔒</div> SSL-krypterad säker betalning</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRMATION (hidden initially) -->
+<div class="confirm-wrap" id="confirmWrap" style="display:none">
+  <div class="confirm-icon">✓</div>
+  <h1 class="confirm-title">Tack för din <em>beställning</em></h1>
+  <p class="confirm-sub">En orderbekräftelse har skickats till din e-post.</p>
+  <div class="confirm-order-id" id="confirmOrderId">ORDER #BL-20260225-4829</div>
+
+  <div class="confirm-card">
+    <h4>Beställningsdetaljer</h4>
+    <div class="confirm-grid" id="confirmGrid"></div>
+    <div class="confirm-items" id="confirmItems"></div>
+  </div>
+
+  <div class="confirm-actions">
+    <a href="index.html" class="btn-primary">Fortsätt handla →</a>
+    <button class="btn-secondary" onclick="window.print()">Skriv ut kvitto</button>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif"><span style="color:var(--sl)">✓</span><span id="nT"></span></div>
+
+<script>
+// ── Demo cart data (in production: read from localStorage / Supabase) ──
+// Read cart from localStorage (shared with index.html & produkt.html)
+const demoCart = [
+  {id:19, n:'Solhatt', l:'Echinacea purpurea \'Magnus\'', c:'Perenner', p:70, q:2, co:'Purpur'},
+  {id:21, n:'Trädgårdsnäva', l:'Geranium ROZANNE', c:'Perenner', p:100, q:1, co:'Blå'},
+  {id:11, n:'Jättedaggkåpa', l:'Alchemilla mollis', c:'Perenner', p:65, q:3, co:'Gul'},
+  {id:501, n:'Strutbräken', l:'Matteuccia struthiopteris', c:'Ormbunkar', p:85, q:1, co:'Grön'},
+  {id:302, n:'Citrontimjan', l:'Thymus x citriodorus', c:'Kryddväxter', p:65, q:2, co:'Rosa'},
+];
+
+// State
+let cart = [];
+try { const saved = localStorage.getItem("blomsterlen_cart"); if (saved) cart = JSON.parse(saved); } catch(e) {}
+if (!cart.length) cart = demoCart; // fallback for demo
+let currentStep = 1;
+let selectedShip = 'standard';
+let selectedPay = 'klarna';
+let discount = 0;
+let discountApplied = false;
+const FREE_SHIP_THRESHOLD = 599;
+const SHIP_PRICES = { standard: 49, express: 99, pickup: 39 };
+
+// ── Helpers ──
+function ge(c) {
+  if (c === 'Ormbunkar') return '🌿';
+  if (c === 'Kryddväxter') return '🌱';
+  if (c === 'Prydnadsgräs') return '🌾';
+  return '🌺';
+}
+function gb(c) {
+  if (c === 'Perenner') return 'linear-gradient(135deg,#C5D4B8,#8B9E7E)';
+  if (c === 'Prydnadsgräs') return 'linear-gradient(135deg,#E8D5C8,#B8964E)';
+  if (c === 'Ormbunkar') return 'linear-gradient(135deg,#a8c5a0,#5C6E52)';
+  return 'linear-gradient(135deg,#E8A98A,#C4785B)';
+}
+
+function getSubtotal() { return cart.reduce((s, c) => s + c.p * c.q, 0); }
+function getItemCount() { return cart.reduce((s, c) => s + c.q, 0); }
+function getShipCost() {
+  const sub = getSubtotal();
+  return sub >= FREE_SHIP_THRESHOLD ? 0 : SHIP_PRICES[selectedShip];
+}
+function getTotal() { return getSubtotal() - discount + getShipCost(); }
+
+function notify(t) {
+  const n = document.getElementById('notif');
+  document.getElementById('nT').textContent = t;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 2500);
+}
+
+// ── Render summary sidebar ──
+function renderSummary() {
+  const items = document.getElementById('summaryItems');
+  const totals = document.getElementById('summaryTotals');
+  const count = document.getElementById('summaryCount');
+
+  count.textContent = getItemCount() + ' artiklar';
+
+  items.innerHTML = cart.map(c => `
+    <div class="si-item">
+      <div class="si-thumb" style="background:${gb(c.c)}">${ge(c.c)}</div>
+      <div class="si-details">
+        <div class="si-name">${c.n}</div>
+        <div class="si-qty">${c.q} st × ${c.p} kr</div>
+      </div>
+      <div class="si-price">${c.p * c.q} kr</div>
+    </div>
+  `).join('');
+
+  const sub = getSubtotal();
+  const ship = getShipCost();
+  const tot = getTotal();
+  const isFreeShip = sub >= FREE_SHIP_THRESHOLD;
+
+  totals.innerHTML = `
+    <div class="stl"><span>Delsumma</span><span class="val">${sub} kr</span></div>
+    ${discount > 0 ? `<div class="stl discount"><span>Rabatt</span><span class="val">−${discount} kr</span></div>` : ''}
+    <div class="stl ship"><span>Frakt</span><span class="val ${isFreeShip ? 'free' : ''}">${isFreeShip ? 'Fri frakt ✓' : ship + ' kr'}</span></div>
+    ${!isFreeShip ? `<div class="stl" style="font-size:11px;color:var(--sage)"><span></span><span>${FREE_SHIP_THRESHOLD - sub} kr kvar till fri frakt</span></div>` : ''}
+    <div class="st-total"><span>Totalt</span><span class="total-price">${tot} kr</span></div>
+  `;
+}
+
+// ── Step navigation ──
+function goToStep(step) {
+  if (step > currentStep) return; // Can only go back by clicking
+  currentStep = step;
+  updateUI();
+}
+
+function nextStep(from) {
+  if (from === 1 && !validateStep1()) return;
+  if (from === 3 && selectedPay === 'card' && !validateCard()) return;
+  if (from === 4) return; // handled by placeOrder
+  currentStep = from + 1;
+  if (currentStep === 4) buildReview();
+  updateUI();
+  localStorage.removeItem("blomsterlen_cart");
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function prevStep(from) {
+  currentStep = from - 1;
+  updateUI();
+  localStorage.removeItem("blomsterlen_cart");
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateUI() {
+  // Panels
+  document.querySelectorAll('.panel').forEach((p, i) => {
+    p.classList.toggle('active', i + 1 === currentStep);
+  });
+
+  // Steps
+  document.querySelectorAll('.step').forEach(s => {
+    const sn = parseInt(s.dataset.step);
+    s.classList.toggle('active', sn === currentStep);
+    s.classList.toggle('done', sn < currentStep);
+    // Update dot content for done steps
+    const dot = s.querySelector('.step-dot');
+    dot.textContent = sn < currentStep ? '✓' : sn;
+  });
+
+  // Progress track
+  const pct = ((currentStep - 1) / 3) * 100;
+  document.getElementById('progressTrack').style.width = pct + '%';
+
+  renderSummary();
+  updateShipPrice();
+}
+
+// ── Validation ──
+function validateStep1() {
+  const fields = [
+    { id: 'firstName', test: v => v.length >= 1 },
+    { id: 'lastName', test: v => v.length >= 1 },
+    { id: 'email', test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+    { id: 'phone', test: v => v.replace(/\D/g, '').length >= 8 },
+    { id: 'address', test: v => v.length >= 3 },
+    { id: 'zip', test: v => v.replace(/\s/g, '').length >= 5 },
+    { id: 'city', test: v => v.length >= 2 },
+  ];
+  let ok = true;
+  fields.forEach(f => {
+    const el = document.getElementById(f.id);
+    const valid = f.test(el.value.trim());
+    el.classList.toggle('error', !valid);
+    if (!valid) ok = false;
+  });
+  if (!ok) notify('Fyll i alla obligatoriska fält');
+  return ok;
+}
+
+function validateCard() {
+  if (selectedPay !== 'card') return true;
+  const fields = [
+    { id: 'cardNum', test: v => v.replace(/\s/g, '').length >= 13 },
+    { id: 'cardExp', test: v => /\d{2}\s*\/\s*\d{2}/.test(v) },
+    { id: 'cardCvc', test: v => v.length >= 3 },
+  ];
+  let ok = true;
+  fields.forEach(f => {
+    const el = document.getElementById(f.id);
+    const valid = f.test(el.value.trim());
+    el.classList.toggle('error', !valid);
+    if (!valid) ok = false;
+  });
+  if (!ok) notify('Fyll i dina kortuppgifter');
+  return ok;
+}
+
+// Remove error on focus
+document.querySelectorAll('.field input').forEach(inp => {
+  inp.addEventListener('focus', () => inp.classList.remove('error'));
+});
+
+// ── Shipping ──
+function selectShip(el) {
+  document.querySelectorAll('.ship-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedShip = el.dataset.ship;
+  updateShipPrice();
+  renderSummary();
+}
+
+function updateShipPrice() {
+  const sub = getSubtotal();
+  const isFree = sub >= FREE_SHIP_THRESHOLD;
+  const stdEl = document.getElementById('shipStdPrice');
+  if (stdEl) {
+    stdEl.textContent = isFree ? 'Fri frakt' : '49 kr';
+    stdEl.classList.toggle('free', isFree);
+  }
+}
+
+// ── Payment ──
+function selectPay(el) {
+  document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPay = el.dataset.pay;
+  document.getElementById('cardFields').classList.toggle('visible', selectedPay === 'card');
+}
+
+// ── Discount ──
+function applyDiscount() {
+  const code = document.getElementById('discountCode').value.trim().toUpperCase();
+  if (discountApplied) { notify('Rabattkod redan tillämpad'); return; }
+  // Demo codes
+  if (code === 'VÄLKOMMEN10' || code === 'VALKOMMEN10') {
+    discount = Math.round(getSubtotal() * 0.1);
+    discountApplied = true;
+    notify('10% rabatt tillagd!');
+  } else if (code === 'GRATIS') {
+    discount = 0;
+    discountApplied = true;
+    // Make shipping free
+    notify('Fri frakt tillagd!');
+  } else {
+    notify('Ogiltig rabattkod');
+    return;
+  }
+  renderSummary();
+}
+
+// ── Build review ──
+function buildReview() {
+  // Items
+  document.getElementById('reviewItems').innerHTML = cart.map(c => `
+    <div class="review-item">
+      <div class="ri-img" style="background:${gb(c.c)}">${ge(c.c)}</div>
+      <div class="ri-info">
+        <div class="ri-name">${c.n}</div>
+        <div class="ri-latin">${c.l}</div>
+        <div class="ri-meta">${c.c}</div>
+      </div>
+      <div class="ri-right">
+        <div class="ri-qty">${c.q} st</div>
+        <div class="ri-price">${c.p * c.q} kr</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Address
+  const fn = document.getElementById('firstName').value;
+  const ln = document.getElementById('lastName').value;
+  const addr = document.getElementById('address').value;
+  const zip = document.getElementById('zip').value;
+  const city = document.getElementById('city').value;
+  const email = document.getElementById('email').value;
+  const phone = document.getElementById('phone').value;
+
+  document.getElementById('reviewAddress').innerHTML = `
+    <p>${fn} ${ln}<br>${addr}<br>${zip} ${city}</p>
+    <p class="small">${email} · ${phone}</p>
+  `;
+
+  const shipNames = { standard: 'Standardfrakt (2–4 dagar)', express: 'Expressfrakt (nästa dag)', pickup: 'Hämta hos ombud (2–3 dagar)' };
+  const payNames = { klarna: 'Klarna — Faktura / Delbetalning', card: 'Kort (Visa/Mastercard)', swish: 'Swish' };
+  document.getElementById('reviewShipPay').innerHTML = `
+    <p>${shipNames[selectedShip]}<br>${payNames[selectedPay]}</p>
+    <p class="small">Totalt: ${getTotal()} kr</p>
+  `;
+}
+
+// Terms checkbox → enable pay button
+document.getElementById('termsCheck').addEventListener('change', function() {
+  document.getElementById('payBtn').disabled = !this.checked;
+});
+
+// ── Place order ──
+function placeOrder() {
+  if (!document.getElementById('termsCheck').checked) return;
+
+  // Hide checkout, show confirmation
+  document.getElementById('checkoutWrap').style.display = 'none';
+  document.getElementById('confirmWrap').style.display = 'block';
+
+  const fn = document.getElementById('firstName').value;
+  const ln = document.getElementById('lastName').value;
+  const email = document.getElementById('email').value;
+  const addr = document.getElementById('address').value;
+  const zip = document.getElementById('zip').value;
+  const city = document.getElementById('city').value;
+  const shipNames = { standard: 'Standardfrakt', express: 'Expressfrakt', pickup: 'Ombud' };
+  const payNames = { klarna: 'Klarna', card: 'Kort', swish: 'Swish' };
+
+  // Order ID
+  const oid = 'BL-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(1000 + Math.random() * 9000);
+  document.getElementById('confirmOrderId').textContent = 'ORDER #' + oid;
+
+  document.getElementById('confirmGrid').innerHTML = `
+    <div class="cg-item"><div class="cg-label">Kund</div><div class="cg-val">${fn} ${ln}<br>${email}</div></div>
+    <div class="cg-item"><div class="cg-label">Leveransadress</div><div class="cg-val">${addr}<br>${zip} ${city}</div></div>
+    <div class="cg-item"><div class="cg-label">Leverans</div><div class="cg-val">${shipNames[selectedShip]}</div></div>
+    <div class="cg-item"><div class="cg-label">Betalning</div><div class="cg-val">${payNames[selectedPay]}</div></div>
+  `;
+
+  document.getElementById('confirmItems').innerHTML = `
+    ${cart.map(c => `<div class="ci-row"><span>${c.n} <span class="ci-meta">× ${c.q}</span></span><span>${c.p * c.q} kr</span></div>`).join('')}
+    ${discount > 0 ? `<div class="ci-row" style="color:var(--ok)"><span>Rabatt</span><span>−${discount} kr</span></div>` : ''}
+    <div class="ci-row"><span>Frakt</span><span>${getShipCost() === 0 ? 'Fri frakt' : getShipCost() + ' kr'}</span></div>
+    <div class="ci-total"><span>Totalt betalt</span><span>${getTotal()} kr</span></div>
+  `;
+
+  localStorage.removeItem("blomsterlen_cart");
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Card formatting ──
+document.getElementById('cardNum').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g, '').slice(0, 16);
+  this.value = v.replace(/(.{4})/g, '$1 ').trim();
+});
+document.getElementById('cardExp').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g, '').slice(0, 4);
+  if (v.length >= 3) v = v.slice(0,2) + ' / ' + v.slice(2);
+  this.value = v;
+});
+document.getElementById('cardCvc').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g, '').slice(0, 4);
+});
+
+// ── Init ──
+renderSummary();
+updateUI();
+</script>
+</body>
+</html>
