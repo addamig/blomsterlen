@@ -28,7 +28,6 @@ Deno.serve(async (req) => {
       }
     } else {
       event = JSON.parse(body);
-      console.warn("No signature verification — missing secret or header");
     }
 
     console.log("Event received:", event.type);
@@ -37,31 +36,35 @@ Deno.serve(async (req) => {
       const session = event.data.object;
       console.log("Checkout completed:", session.id, session.customer_email);
 
-      let orderItems: any[] = [];
-      try {
-        const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
-        orderItems = lineItems.data.map((item: any) => ({
-          name: item.description,
-          quantity: item.quantity,
-          price_cents: item.amount_total,
-        }));
-      } catch (err) {
-        console.error("Line items fetch failed:", err.message);
-      }
+      const meta = session.metadata || {};
+
+      // Parse name into parts
+      const nameParts = (meta.customer_name || "").split(" ");
+      const shippingName = meta.customer_name || "";
+
+      // Parse address
+      const addressParts = (meta.shipping_address || "").split(", ");
+      const shippingAddress = addressParts[0] || "";
+      const postalCity = addressParts[1] || "";
+      const postalParts = postalCity.split(" ");
+      const postalCode = postalParts[0] || "";
+      const city = postalParts.slice(1).join(" ") || "";
 
       const orderData = {
-        customer_email: session.customer_email || "",
-        customer_name: session.metadata?.customer_name || "",
-        shipping_address: {
-          address: session.metadata?.shipping_address || "",
-          type: session.metadata?.shipping_type || "",
-          note: session.metadata?.shipping_note || "",
-          phone: session.metadata?.customer_phone || "",
-        },
-        items: orderItems,
-        total_amount: session.amount_total || 0,
         status: "paid",
-        stripe_session_id: session.id,
+        shipping_name: shippingName,
+        shipping_address: shippingAddress,
+        shipping_postal_code: postalCode,
+        shipping_city: city,
+        shipping_country: "SE",
+        email: session.customer_email || "",
+        phone: meta.customer_phone || "",
+        subtotal_incl_vat: (session.amount_total || 0) / 100,
+        shipping_cost: 0,
+        total_incl_vat: (session.amount_total || 0) / 100,
+        payment_method: "stripe",
+        payment_intent_id: session.payment_intent || session.id,
+        notes: meta.shipping_note || "",
       };
 
       console.log("Inserting order:", JSON.stringify(orderData));
