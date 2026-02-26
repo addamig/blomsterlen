@@ -67,7 +67,7 @@ body{opacity:0;transition:opacity .35s ease}body.ready{opacity:1}body.leaving{op
 <nav id="mainNav"><div class="ni">
 <div class="nl"><a href="#categories">Kategorier</a><a href="#products">Alla växter</a><a href="om-oss.html">Om oss</a><a href="kundservice.html">Kundservice</a></div>
 <a href="index.html" class="logo">Blomster<em>len</em></a>
-<div class="na"><button onclick="openSearch()">Sök</button><button class="cb" onclick="toggleWishlist()">♥<span class="cc wlc" id="wlCount" style="display:none">0</span></button><button class="cb" onclick="toggleCart()">Varukorg<span class="cc" id="cartCount">0</span></button></div>
+<div class="na"><button onclick="openSearch()">Sök</button><button class="cb" onclick="toggleWishlist()" id="wlBtn">♡<span class="cc wlc" id="wlCount" style="display:none">0</span></button><button class="cb" onclick="toggleCart()">Varukorg<span class="cc" id="cartCount">0</span></button></div>
 </div></nav>
 
 <div class="so" id="searchOverlay" onclick="if(event.target===this)closeSearch()"><div class="sb">
@@ -375,6 +375,7 @@ function tw(id) {
   else { wl.add(id); notify('Tillagd i önskelistan ♥'); }
   localStorage.setItem('blomsterlen_wl', JSON.stringify([...wl]));
   uwl();
+  renderWishlist();
   render();
 }
 function toggleWishlist() {
@@ -384,7 +385,9 @@ function toggleWishlist() {
 }
 function uwl() {
   const c = document.getElementById('wlCount');
+  const btn = document.getElementById('wlBtn');
   if (c) { c.textContent = wl.size; c.style.display = wl.size > 0 ? 'flex' : 'none'; }
+  if (btn) { btn.firstChild.textContent = wl.size > 0 ? '♥' : '♡'; }
 }
 function renderWishlist() {
   const d = document.getElementById('wdi');
