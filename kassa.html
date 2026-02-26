@@ -754,30 +754,98 @@ async function startStripeCheckout() {
 }
 
 // ── Handle return from Stripe ──
-function handleStripeReturn() {
+const ORDER_URL = 'https://jymaudfvcfhmjnfxucbk.supabase.co/functions/v1/get-order';
+
+async function handleStripeReturn() {
   const params = new URLSearchParams(window.location.search);
 
   if (params.get('success') === 'true') {
-    // Payment successful — show confirmation
     document.getElementById('checkoutWrap').style.display = 'none';
     document.getElementById('confirmWrap').style.display = 'block';
+    localStorage.removeItem("blomsterlen_cart");
 
     const sessionId = params.get('session_id') || '';
     const oid = 'BL-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + sessionId.slice(-4).toUpperCase();
     document.getElementById('confirmOrderId').textContent = 'ORDER #' + oid;
 
-    document.getElementById('confirmGrid').innerHTML = `
-      <div class="cg-item"><div class="cg-label">Status</div><div class="cg-val" style="color:var(--sd);font-weight:600">✓ Betalning genomförd</div></div>
-      <div class="cg-item"><div class="cg-label">Betalning</div><div class="cg-val">Via Stripe (Klarna / Kort)</div></div>
-    `;
+    document.getElementById('confirmGrid').innerHTML = '<div style="text-align:center;padding:20px;color:var(--el)">Hämtar orderdetaljer...</div>';
+    document.getElementById('confirmItems').innerHTML = '';
 
-    document.getElementById('confirmItems').innerHTML = `
-      <div class="ci-total"><span>Tack för din beställning!</span></div>
-      <p style="color:var(--el);font-size:14px;margin-top:12px">En orderbekräftelse skickas till din e-post.</p>
-    `;
+    try {
+      const res = await fetch(ORDER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId }),
+      });
+      const order = await res.json();
+      if (!res.ok) throw new Error(order.error || 'Kunde inte hämta order');
 
-    localStorage.removeItem("blomsterlen_cart");
-    // Clean URL
+      const products = order.items.filter(i => !i.is_shipping);
+      const shippingItem = order.items.find(i => i.is_shipping);
+      const shippingCost = shippingItem ? shippingItem.total : 0;
+      const subtotal = products.reduce((s, i) => s + i.total, 0);
+      const shipNames = { standard: 'Standardfrakt (2–4 dagar)', express: 'Expressfrakt (nästa dag)', pickup: 'Hämta hos ombud (2–3 dagar)' };
+
+      document.getElementById('confirmGrid').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+          <div>
+            <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--sage);font-weight:600;margin-bottom:8px">Kund</div>
+            <div style="color:var(--earth);font-size:14px;line-height:1.6">${order.customer_name}<br>${order.email}<br>${order.phone}</div>
+          </div>
+          <div>
+            <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--sage);font-weight:600;margin-bottom:8px">Leveransadress</div>
+            <div style="color:var(--earth);font-size:14px;line-height:1.6">${order.address}<br>${order.zip} ${order.city}</div>
+          </div>
+        </div>
+        <div style="margin-bottom:24px">
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--sage);font-weight:600;margin-bottom:8px">Leveranssätt</div>
+          <div style="color:var(--earth);font-size:14px">${shipNames[order.shipping_type] || 'Standardfrakt'}</div>
+        </div>
+      `;
+
+      const itemsHtml = products.map(item => `
+        <div style="display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--pl)">
+          <div style="width:64px;height:80px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--pl)">
+            ${item.image ? '<img src="' + item.image + '" alt="' + item.name + '" style="width:100%;height:100%;object-fit:cover">' : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px">🌿</div>'}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;color:var(--earth);font-size:15px;margin-bottom:3px">${item.name}</div>
+            <div style="color:var(--sage);font-size:13px">${item.quantity} st × ${item.unit_price} kr</div>
+          </div>
+          <div style="font-weight:600;color:var(--earth);font-size:15px;white-space:nowrap">${item.total} kr</div>
+        </div>
+      `).join('');
+
+      document.getElementById('confirmItems').innerHTML = `
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--sage);font-weight:600;margin-bottom:4px">Produkter</div>
+        ${itemsHtml}
+        <div style="margin-top:20px">
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:14px;color:var(--el)">
+            <span>Delsumma</span><span style="color:var(--earth)">${subtotal} kr</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:14px;color:var(--el)">
+            <span>Frakt</span><span style="color:var(--earth)">${shippingCost > 0 ? shippingCost + ' kr' : 'Fri frakt ✓'}</span>
+          </div>
+          <div style="border-top:2px solid var(--pl);margin-top:12px;padding-top:12px;display:flex;justify-content:space-between;font-size:18px;font-weight:700;color:var(--earth)">
+            <span>Totalt</span><span>${order.total} kr</span>
+          </div>
+          <div style="font-size:12px;color:var(--sage);margin-top:4px">varav moms 25%: ${Math.round(order.total * 0.2)} kr</div>
+        </div>
+        <div style="margin-top:24px;padding:20px;background:var(--pl);border-radius:12px">
+          <div style="font-weight:600;color:var(--earth);margin-bottom:6px">🌱 Tips inför leveransen</div>
+          <div style="font-size:13px;color:var(--el);line-height:1.7">Dina växter skickas i specialemballage. Plantera dem inom ett par dagar efter leverans och vattna ordentligt.</div>
+        </div>
+      `;
+    } catch (err) {
+      console.error('Failed to fetch order:', err);
+      document.getElementById('confirmGrid').innerHTML = `
+        <div class="cg-item"><div class="cg-label">Status</div><div class="cg-val" style="color:var(--sd);font-weight:600">✓ Betalning genomförd</div></div>
+      `;
+      document.getElementById('confirmItems').innerHTML = `
+        <p style="color:var(--el);font-size:14px">En orderbekräftelse skickas till din e-post med alla detaljer.</p>
+      `;
+    }
+
     window.history.replaceState({}, '', window.location.pathname);
   }
 
