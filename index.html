@@ -13,7 +13,7 @@ html{scroll-behavior:smooth}body{font-family:var(--fb);background:var(--cream);c
 
 .ann{background:var(--moss);color:var(--sl);text-align:center;padding:10px 20px;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;font-weight:500}.ann span{color:var(--tl)}
 
-nav{position:sticky;top:0;z-index:1000;background:rgba(250,247,242,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(139,158,126,.15);transition:box-shadow .4s}nav.scrolled{box-shadow:0 4px 30px rgba(61,50,41,.06)}.ni{max-width:1440px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:16px 48px}.nl{display:flex;gap:32px}.nl a{text-decoration:none;color:var(--earth);font-size:13px;letter-spacing:1.5px;text-transform:uppercase;font-weight:500;position:relative;transition:color .3s}.nl a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1.5px;background:var(--sage);transition:width .3s}.nl a:hover{color:var(--sd)}.nl a:hover::after{width:100%}.logo{font-family:var(--fd);font-size:32px;font-weight:300;color:var(--earth);letter-spacing:3px;text-decoration:none}.logo em{font-style:italic;color:var(--sage);font-weight:400}.na{display:flex;gap:20px;align-items:center}.na button{background:none;border:none;cursor:pointer;color:var(--earth);font-size:13px;letter-spacing:1.5px;text-transform:uppercase;font-family:var(--fb);font-weight:500;transition:color .3s}.na button:hover{color:var(--sd)}.cb{position:relative}.cc{position:absolute;top:-8px;right:-12px;background:var(--terra);color:white;font-size:10px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600}
+nav{position:sticky;top:0;z-index:1000;background:rgba(250,247,242,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(139,158,126,.15);transition:box-shadow .4s}nav.scrolled{box-shadow:0 4px 30px rgba(61,50,41,.06)}.ni{max-width:1440px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:16px 48px}.nl{display:flex;gap:32px}.nl a{text-decoration:none;color:var(--earth);font-size:13px;letter-spacing:1.5px;text-transform:uppercase;font-weight:500;position:relative;transition:color .3s}.nl a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1.5px;background:var(--sage);transition:width .3s}.nl a:hover{color:var(--sd)}.nl a:hover::after{width:100%}.logo{font-family:var(--fd);font-size:32px;font-weight:300;color:var(--earth);letter-spacing:3px;text-decoration:none}.logo em{font-style:italic;color:var(--sage);font-weight:400}.na{display:flex;gap:20px;align-items:center}.na button{background:none;border:none;cursor:pointer;color:var(--earth);font-size:13px;letter-spacing:1.5px;text-transform:uppercase;font-family:var(--fb);font-weight:500;transition:color .3s}.na button:hover{color:var(--sd)}.cb{position:relative}.cc{position:absolute;top:-8px;right:-12px;background:var(--terra);color:white;font-size:10px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600}.wlc{background:var(--sage)}
 
 .so{position:fixed;inset:0;background:rgba(61,50,41,.6);backdrop-filter:blur(6px);z-index:1500;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;align-items:flex-start;justify-content:center;padding-top:120px}.so.open{opacity:1;pointer-events:all}.sb{background:var(--w);border-radius:16px;padding:8px;width:90%;max-width:640px;box-shadow:0 20px 60px rgba(0,0,0,.2);transform:translateY(-20px);transition:transform .3s}.so.open .sb{transform:translateY(0)}.si{width:100%;padding:18px 24px;border:none;font-size:18px;font-family:var(--fb);color:var(--earth);background:transparent;outline:none}.si::placeholder{color:var(--el)}.sr{max-height:400px;overflow-y:auto;border-top:1px solid rgba(139,158,126,.15)}.sri{display:flex;align-items:center;gap:16px;padding:14px 24px;cursor:pointer;transition:background .2s}.sri:hover{background:var(--pl)}
 
@@ -67,7 +67,7 @@ body{opacity:0;transition:opacity .35s ease}body.ready{opacity:1}body.leaving{op
 <nav id="mainNav"><div class="ni">
 <div class="nl"><a href="#categories">Kategorier</a><a href="#products">Alla växter</a><a href="om-oss.html">Om oss</a><a href="kundservice.html">Kundservice</a></div>
 <a href="index.html" class="logo">Blomster<em>len</em></a>
-<div class="na"><button onclick="openSearch()">Sök</button><button class="cb" onclick="toggleCart()">Varukorg<span class="cc" id="cartCount">0</span></button></div>
+<div class="na"><button onclick="openSearch()">Sök</button><button class="cb" onclick="toggleWishlist()">♥<span class="cc wlc" id="wlCount" style="display:none">0</span></button><button class="cb" onclick="toggleCart()">Varukorg<span class="cc" id="cartCount">0</span></button></div>
 </div></nav>
 
 <div class="so" id="searchOverlay" onclick="if(event.target===this)closeSearch()"><div class="sb">
@@ -150,13 +150,16 @@ body{opacity:0;transition:opacity .35s ease}body.ready{opacity:1}body.leaving{op
 <div class="cdi" id="cdi"><div class="cem"><div>🛒</div><p>Din varukorg är tom</p></div></div>
 <div class="cdf" id="cdf" style="display:none"><div class="cdt"><h4>Totalt</h4><span class="tp" id="cT">0 kr</span></div><div class="cds">Fri frakt vid köp över 599 kr</div><a href="kassa.html" class="cdc">Till kassan →</a></div></div>
 
+<div class="cdr" id="wdr"><div class="cdh"><h3>Önskelista ♥</h3><button class="cdx" onclick="toggleWishlist()">✕</button></div>
+<div class="cdi" id="wdi"><div class="cem"><div>♥</div><p>Din önskelista är tom</p></div></div></div>
+
 <div class="notif" id="notif"><span style="color:var(--sl)">✓</span><span id="nT"></span></div>
 
 <script>
 const SUPABASE_URL = 'https://jymaudfvcfhmjnfxucbk.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_tU8OQHV4z23BnM17a_QHtg_is4UE_jr';
 
-let P=[], cart=[], wl=new Set(), curCat='all', pg=1;
+let P=[], cart=[], wl=new Set(JSON.parse(localStorage.getItem('blomsterlen_wl') || '[]')), curCat='all', pg=1;
 const pp=24;
 
 // ── Fetch products from Supabase ──
@@ -370,7 +373,40 @@ function toggleCart() {
 function tw(id) {
   if (wl.has(id)) { wl.delete(id); notify('Borttagen från önskelistan'); }
   else { wl.add(id); notify('Tillagd i önskelistan ♥'); }
+  localStorage.setItem('blomsterlen_wl', JSON.stringify([...wl]));
+  uwl();
   render();
+}
+function toggleWishlist() {
+  const d = document.getElementById('wdr');
+  d.classList.toggle('open');
+  renderWishlist();
+}
+function uwl() {
+  const c = document.getElementById('wlCount');
+  if (c) { c.textContent = wl.size; c.style.display = wl.size > 0 ? 'flex' : 'none'; }
+}
+function renderWishlist() {
+  const d = document.getElementById('wdi');
+  if (!wl.size) { d.innerHTML = '<div class="cem"><div>♥</div><p>Din önskelista är tom</p></div>'; return; }
+  const items = P.filter(p => wl.has(p.id));
+  d.innerHTML = items.map(p => {
+    const hasImg = p.img;
+    const thumbStyle = hasImg ? 'background-image:url(' + p.img + ');background-size:cover;background-position:center' : 'background:' + gb(p.c);
+    const thumbContent = hasImg ? '' : ge(p.c, p.n);
+    return '<div class="ci" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(139,158,126,.1)">' +
+      '<div style="width:52px;height:65px;border-radius:8px;overflow:hidden;flex-shrink:0;' + thumbStyle + ';display:flex;align-items:center;justify-content:center;font-size:18px">' + thumbContent + '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-weight:500;font-size:14px;color:var(--earth);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + p.n + '</div>' +
+        '<div style="font-size:12px;color:var(--el);font-style:italic">' + p.l + '</div>' +
+        '<div style="font-size:13px;font-weight:600;color:var(--earth);margin-top:2px">' + p.p + ' kr</div>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">' +
+        '<button onclick="event.stopPropagation();addToCart(\'' + p.id + '\')" style="background:var(--sage);color:white;border:none;padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-family:var(--fb);letter-spacing:.5px">Köp</button>' +
+        '<button onclick="event.stopPropagation();tw(\'' + p.id + '\')" style="background:none;border:1px solid rgba(199,91,74,.3);color:var(--terra);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:var(--fb)">Ta bort</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
 }
 function notify(t) {
   const n = document.getElementById('notif');
@@ -387,6 +423,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSearch(
 // Boot
 loadCart();
 uc();
+uwl();
 init();
 
 // ── Page transitions ──

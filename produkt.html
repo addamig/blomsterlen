@@ -433,6 +433,11 @@ function renderProduct(p) {
   // Show content
   document.getElementById('loadingState').style.display = 'none';
   document.getElementById('pdWrap').style.display = 'grid';
+
+  // Set wishlist heart state
+  const wl = new Set(JSON.parse(localStorage.getItem('blomsterlen_wl') || '[]'));
+  const wishBtn = document.getElementById('pdWish');
+  if (wishBtn && wl.has(p.id)) { wishBtn.classList.add('act'); wishBtn.textContent = '♥'; }
 }
 
 function getCareAdvice(p) {
@@ -564,10 +569,13 @@ function toggleCart() {
 }
 
 function toggleWish() {
+  if (!product) return;
   const btn = document.getElementById('pdWish');
-  const isActive = btn.classList.toggle('act');
-  btn.textContent = isActive ? '♥' : '♡';
-  notify(isActive ? 'Tillagd i önskelistan ♥' : 'Borttagen från önskelistan');
+  const wl = new Set(JSON.parse(localStorage.getItem('blomsterlen_wl') || '[]'));
+  const id = product.id;
+  if (wl.has(id)) { wl.delete(id); btn.classList.remove('act'); btn.textContent = '♡'; notify('Borttagen från önskelistan'); }
+  else { wl.add(id); btn.classList.add('act'); btn.textContent = '♥'; notify('Tillagd i önskelistan ♥'); }
+  localStorage.setItem('blomsterlen_wl', JSON.stringify([...wl]));
 }
 
 function notify(t) {
