@@ -331,9 +331,9 @@ function addToCart(id) {
   if (!p) return;
   const e = cart.find(c => String(c.id) === String(id));
   if (e) e.q++; else cart.push({ ...p, q: 1 });
-  saveCart(); uc(); notify(p.n + ' tillagd i varukorgen');
+  saveCart(); uc(true); notify(p.n + ' tillagd i varukorgen');
 }
-function rc(id) { cart = cart.filter(c => c.id !== id); saveCart(); uc(); }
+function rc(id) { cart = cart.filter(c => c.id !== id); saveCart(); uc(true); }
 function uq(id, d) { const i = cart.find(c => c.id === id); if (i) { i.q += d; if (i.q <= 0) rc(id); else { saveCart(); uc(); } } }
 
 function saveCart() {
@@ -346,7 +346,7 @@ function loadCart() {
   } catch(e) {}
 }
 
-function uc() {
+function uc(fullRender) {
   const cnt = cart.reduce((s, c) => s + c.q, 0);
   document.getElementById('cartCount').textContent = cnt;
   const d = document.getElementById('cdi'), f = document.getElementById('cdf');
@@ -354,13 +354,22 @@ function uc() {
     d.innerHTML = '<div class="cem"><div>🛒</div><p>Din varukorg är tom</p></div>';
     f.style.display = 'none';
   } else {
-    d.innerHTML = cart.map(c => {
-      const thumbStyle = c.img
-        ? `background-image:url('${c.img}');background-size:cover;background-position:center`
-        : `background:${gb(c.c)}`;
-      const thumbContent = c.img ? '' : ge(c.c, c.n);
-      return `<div class="ci"><div class="cic" style="${thumbStyle}">${thumbContent}</div><div class="cii"><div class="cin">${c.n}</div><div class="cip">${c.p} kr/st</div><div class="ciq"><button class="qb" onclick="uq('${c.id}',-1)">−</button><span>${c.q}</span><button class="qb" onclick="uq('${c.id}',1)">+</button></div></div><button class="cir" onclick="rc('${c.id}')">Ta bort</button></div>`;
-    }).join('');
+    // Only do full re-render if items added/removed, not on qty change
+    if (fullRender || d.querySelectorAll('.ci').length !== cart.length) {
+      d.innerHTML = cart.map(c => {
+        const thumbStyle = c.img
+          ? `background-image:url('${c.img}');background-size:cover;background-position:center`
+          : `background:${gb(c.c)}`;
+        const thumbContent = c.img ? '' : ge(c.c, c.n);
+        return `<div class="ci" data-cid="${c.id}"><div class="cic" style="${thumbStyle}">${thumbContent}</div><div class="cii"><div class="cin">${c.n}</div><div class="cip">${c.p} kr/st</div><div class="ciq"><button class="qb" onclick="uq('${c.id}',-1)">−</button><span class="ciqv">${c.q}</span><button class="qb" onclick="uq('${c.id}',1)">+</button></div></div><button class="cir" onclick="rc('${c.id}')">Ta bort</button></div>`;
+      }).join('');
+    } else {
+      // Just update quantities
+      cart.forEach(c => {
+        const el = d.querySelector(`[data-cid="${c.id}"] .ciqv`);
+        if (el) el.textContent = c.q;
+      });
+    }
     f.style.display = 'block';
     document.getElementById('cT').textContent = cart.reduce((s, c) => s + c.p * c.q, 0) + ' kr';
   }
