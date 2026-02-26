@@ -284,6 +284,7 @@ async function sendConfirmationEmail(data: EmailData) {
       body: JSON.stringify({
         from: "Blomsterlen <order@blomsterlen.se>",
         to: [data.to],
+        bcc: ["richard@addamig.se"],
         subject: `Orderbekräftelse #${data.orderNumber} — Blomsterlen`,
         html,
       }),
