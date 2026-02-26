@@ -430,13 +430,15 @@ uwl();
 init();
 
 // ── Page transitions ──
-function setReady() { document.body.classList.add('ready'); }
+function setReady() { document.body.classList.remove('leaving'); document.body.classList.add('ready'); }
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
   requestAnimationFrame(setReady);
 } else {
   window.addEventListener('DOMContentLoaded', () => requestAnimationFrame(setReady));
 }
 setTimeout(setReady, 500);
+// Fix bfcache (back/forward): page may be restored with leaving class
+window.addEventListener('pageshow', function(e) { setReady(); });
 function navigateTo(url) {
   document.body.classList.add('leaving');
   setTimeout(() => window.location.href = url, 250);
