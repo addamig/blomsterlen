@@ -390,11 +390,13 @@ uc();
 init();
 
 // ── Page transitions ──
+function setReady() { document.body.classList.add('ready'); }
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
-  requestAnimationFrame(() => document.body.classList.add('ready'));
+  requestAnimationFrame(setReady);
 } else {
-  window.addEventListener('DOMContentLoaded', () => requestAnimationFrame(() => document.body.classList.add('ready')));
+  window.addEventListener('DOMContentLoaded', () => requestAnimationFrame(setReady));
 }
+setTimeout(setReady, 500);
 function navigateTo(url) {
   document.body.classList.add('leaving');
   setTimeout(() => window.location.href = url, 250);
