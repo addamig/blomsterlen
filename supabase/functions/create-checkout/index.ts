@@ -124,7 +124,9 @@ Deno.serve(async (req) => {
       metadata: {
         customer_name: `${customer.firstName} ${customer.lastName}`,
         customer_phone: customer.phone || "",
-        shipping_address: `${customer.address}, ${customer.zip} ${customer.city}`,
+        shipping_address: customer.address,
+        shipping_zip: customer.zip,
+        shipping_city: customer.city,
         shipping_type: shipType,
         shipping_note: shipping.note || "",
         discount_code: discount_code || "",

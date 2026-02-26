@@ -38,24 +38,12 @@ Deno.serve(async (req) => {
 
       const meta = session.metadata || {};
 
-      // Parse name into parts
-      const nameParts = (meta.customer_name || "").split(" ");
-      const shippingName = meta.customer_name || "";
-
-      // Parse address
-      const addressParts = (meta.shipping_address || "").split(", ");
-      const shippingAddress = addressParts[0] || "";
-      const postalCity = addressParts[1] || "";
-      const postalParts = postalCity.split(" ");
-      const postalCode = postalParts[0] || "";
-      const city = postalParts.slice(1).join(" ") || "";
-
       const orderData = {
         status: "paid",
-        shipping_name: shippingName,
-        shipping_address: shippingAddress,
-        shipping_postal_code: postalCode,
-        shipping_city: city,
+        shipping_name: meta.customer_name || "",
+        shipping_address: meta.shipping_address || "",
+        shipping_postal_code: meta.shipping_zip || "",
+        shipping_city: meta.shipping_city || "",
         shipping_country: "SE",
         email: session.customer_email || "",
         phone: meta.customer_phone || "",
