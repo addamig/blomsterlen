@@ -112,6 +112,21 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Log the send (skip for test emails)
+    if (!test_email && totalSent > 0) {
+      try {
+        await supabase.from("newsletter_sends").insert({
+          subject,
+          html,
+          recipient_count: totalSent,
+          status: errors.length > 0 ? "partial" : "sent",
+          sent_by: "admin",
+        });
+      } catch (logErr) {
+        console.error("Failed to log send:", logErr.message);
+      }
+    }
+
     return new Response(
       JSON.stringify({
         success: true,

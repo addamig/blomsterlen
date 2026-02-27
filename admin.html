@@ -5,7 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blomsterlen · Backoffice</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+
+// ═══ SEND HISTORY ═══
+let sendHistory=[];
+
+async function loadSendHistory(){
+    try{
+        const{data,error}=await db.from('newsletter_sends').select('*').order('sent_at',{ascending:false}).limit(20);
+        if(error)throw error;
+        sendHistory=data||[];
+        renderSendHistory();
+    }catch(e){console.error(e)}
+}
+
+function renderSendHistory(){
+    const tb=document.getElementById('sh-body');
+    if(!sendHistory.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Inga utskick ännu</td></tr>';return}
+    tb.innerHTML=sendHistory.map(s=>{
+        const st=s.status==='sent'?'<span class="badge b-ok">Skickat</span>':s.status==='partial'?'<span class="badge b-warn">Delvis</span>':'<span class="badge b-n">'+E(s.status)+'</span>';
+        return`<tr>
+            <td><span class="np">${E(s.subject)}</span></td>
+            <td>${s.recipient_count} st</td>
+            <td>${st}</td>
+            <td>${D(s.sent_at)}</td>
+            <td><button class="ab" onclick="previewSent('${s.id}')" title="Visa mail">👁</button></td>
+        </tr>`;
+    }).join('');
+}
+
+function previewSent(id){
+    const s=sendHistory.find(x=>x.id===id);
+    if(!s||!s.html)return;
+    const iframe=document.getElementById('nl-preview');
+    if(iframe)iframe.srcdoc=s.html;
+    toast('Visar: '+s.subject);
+}
+</script>
     <style>
         :root{--bg:#0f110f;--bg-card:#181a18;--bg-hover:#1e211e;--bg-input:#1c1f1c;--border:#2a2d2a;--border-focus:#4a7c59;--text:#e8e6e1;--dim:#8a8880;--muted:#5a5850;--accent:#5b9a6a;--accent-h:#6db47e;--accent-bg:rgba(91,154,106,.1);--danger:#c45c5c;--danger-bg:rgba(196,92,92,.1);--warn:#c4a35c;--warn-bg:rgba(196,163,92,.1);--ok:#5b9a6a;--ok-bg:rgba(91,154,106,.15);--r:8px;--rl:12px}
         *{margin:0;padding:0;box-sizing:border-box}
@@ -649,6 +685,7 @@ function initSendView(){
     renderModules();
     previewNL();
     if(nlProductCache.length===0)loadProductCache();
+    loadSendHistory();
 }
 
 async function loadProductCache(){
@@ -795,6 +832,42 @@ async function sendNL(){
     btn.disabled=false;btn.textContent='\ud83d\ude80 Skicka till alla';
 }
 
+
+
+// ═══ SEND HISTORY ═══
+let sendHistory=[];
+
+async function loadSendHistory(){
+    try{
+        const{data,error}=await db.from('newsletter_sends').select('*').order('sent_at',{ascending:false}).limit(20);
+        if(error)throw error;
+        sendHistory=data||[];
+        renderSendHistory();
+    }catch(e){console.error(e)}
+}
+
+function renderSendHistory(){
+    const tb=document.getElementById('sh-body');
+    if(!sendHistory.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Inga utskick ännu</td></tr>';return}
+    tb.innerHTML=sendHistory.map(s=>{
+        const st=s.status==='sent'?'<span class="badge b-ok">Skickat</span>':s.status==='partial'?'<span class="badge b-warn">Delvis</span>':'<span class="badge b-n">'+E(s.status)+'</span>';
+        return`<tr>
+            <td><span class="np">${E(s.subject)}</span></td>
+            <td>${s.recipient_count} st</td>
+            <td>${st}</td>
+            <td>${D(s.sent_at)}</td>
+            <td><button class="ab" onclick="previewSent('${s.id}')" title="Visa mail">👁</button></td>
+        </tr>`;
+    }).join('');
+}
+
+function previewSent(id){
+    const s=sendHistory.find(x=>x.id===id);
+    if(!s||!s.html)return;
+    const iframe=document.getElementById('nl-preview');
+    if(iframe)iframe.srcdoc=s.html;
+    toast('Visar: '+s.subject);
+}
 </script>
 </body>
 </html>
