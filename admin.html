@@ -5,44 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blomsterlen · Backoffice</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-
-// ═══ SEND HISTORY ═══
-let sendHistory=[];
-
-async function loadSendHistory(){
-    try{
-        const{data,error}=await db.from('newsletter_sends').select('*').order('sent_at',{ascending:false}).limit(20);
-        if(error)throw error;
-        sendHistory=data||[];
-        renderSendHistory();
-    }catch(e){console.error(e)}
-}
-
-function renderSendHistory(){
-    const tb=document.getElementById('sh-body');
-    if(!sendHistory.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Inga utskick ännu</td></tr>';return}
-    tb.innerHTML=sendHistory.map(s=>{
-        const st=s.status==='sent'?'<span class="badge b-ok">Skickat</span>':s.status==='partial'?'<span class="badge b-warn">Delvis</span>':'<span class="badge b-n">'+E(s.status)+'</span>';
-        return`<tr>
-            <td><span class="np">${E(s.subject)}</span></td>
-            <td>${s.recipient_count} st</td>
-            <td>${st}</td>
-            <td>${D(s.sent_at)}</td>
-            <td><button class="ab" onclick="previewSent('${s.id}')" title="Visa mail">👁</button></td>
-        </tr>`;
-    }).join('');
-}
-
-function previewSent(id){
-    const s=sendHistory.find(x=>x.id===id);
-    if(!s||!s.html)return;
-    const iframe=document.getElementById('nl-preview');
-    if(iframe)iframe.srcdoc=s.html;
-    toast('Visar: '+s.subject);
-}
-</script>
-    <style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
         :root{--bg:#0f110f;--bg-card:#181a18;--bg-hover:#1e211e;--bg-input:#1c1f1c;--border:#2a2d2a;--border-focus:#4a7c59;--text:#e8e6e1;--dim:#8a8880;--muted:#5a5850;--accent:#5b9a6a;--accent-h:#6db47e;--accent-bg:rgba(91,154,106,.1);--danger:#c45c5c;--danger-bg:rgba(196,92,92,.1);--warn:#c4a35c;--warn-bg:rgba(196,163,92,.1);--ok:#5b9a6a;--ok-bg:rgba(91,154,106,.15);--r:8px;--rl:12px}
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
@@ -270,6 +234,18 @@ function previewSent(id){
             </div>
         </div>
     </div>
+
+    <!-- Send history -->
+    <div style="margin-top:28px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <span style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600">Utskickshistorik</span>
+            <button class="btn btn-s btn-sm" onclick="loadSendHistory()">↻</button>
+        </div>
+        <div class="tw"><div class="ts"><table>
+            <thead><tr><th>Ämne</th><th>Mottagare</th><th>Status</th><th>Skickat</th><th style="width:60px"></th></tr></thead>
+            <tbody id="sh-body"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Inga utskick ännu</td></tr></tbody>
+        </table></div></div>
+    </div>
 </div>
 
 <!-- Product search modal for newsletter -->
@@ -316,7 +292,6 @@ function previewSent(id){
 <div class="mo" id="om-modal"><div class="md" style="max-width:400px"><h3>Uppdatera orderstatus</h3><input type="hidden" id="om-id"><div class="fi" style="margin-bottom:12px"><label>Order</label><div id="om-ref" style="font-weight:600;padding:8px 0"></div></div><div class="fi"><label>Ny status</label><select id="om-st"><option value="pending">Pending</option><option value="paid">Betald</option><option value="shipped">Skickad</option><option value="completed">Slutförd</option><option value="cancelled">Avbruten</option></select></div><div class="ma"><button class="btn btn-s" onclick="closeM('om-modal')">Avbryt</button><button class="btn btn-p" onclick="saveOS()">Uppdatera</button></div></div></div>
 
 <div class="tc" id="toasts"></div>
-
 
 <script>
 const SB_URL='https://jymaudfvcfhmjnfxucbk.supabase.co';
