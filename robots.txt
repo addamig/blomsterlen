@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /kassa.html
+
+Sitemap: https://blomsterlen.se/sitemap.xml

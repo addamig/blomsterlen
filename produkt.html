@@ -4,6 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blomsterlen — Produkt</title>
+<meta name="description" content="Köp växter online från Blomsterlen. Svenskodlade perenner, prydnadsgräs, ormbunkar och kryddväxter från Lackalänga Trädgård.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://blomsterlen.se/produkt.html">
+
+<meta property="og:type" content="product">
+<meta property="og:site_name" content="Blomsterlen">
+<meta property="og:title" content="Blomsterlen — Produkt">
+<meta property="og:description" content="Köp växter online från Blomsterlen.">
+<meta property="og:url" content="https://blomsterlen.se/produkt.html">
+<meta property="og:image" content="https://blomsterlen.se/og-image.jpg">
+<meta property="og:locale" content="sv_SE">
+<meta property="product:price:amount" content="">
+<meta property="product:price:currency" content="SEK">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Blomsterlen — Produkt">
+<meta name="twitter:description" content="Köp växter online från Blomsterlen.">
+<meta name="twitter:image" content="https://blomsterlen.se/og-image.jpg">
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+<script type="application/ld+json" id="productSchema">{}</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -357,7 +381,74 @@ async function fetchRelated(category, excludeId) {
 // ── Render product detail ──
 function renderProduct(p) {
   product = p;
-  document.title = `${p.swedish_name} — Blomsterlen`;
+  document.title = `${p.swedish_name} (${p.latin_name}) — Köp online | Blomsterlen`;
+
+  // ── Dynamic SEO ──
+  const seoPrice = Math.round(p.retail_price_incl_vat);
+  const seoImg = p.image_url || 'https://blomsterlen.se/og-image.jpg';
+  const seoUrl = `https://blomsterlen.se/produkt.html#${p.slug}`;
+  const seoDesc = `${p.swedish_name} (${p.latin_name}) — ${p.category}. ${p.bloom_color && p.bloom_color !== '-' ? 'Blomfärg: ' + p.bloom_color + '. ' : ''}${p.height_cm ? 'Höjd: ' + p.height_cm + ' cm. ' : ''}${seoPrice} kr inkl. moms. Köp online från Blomsterlen.`;
+
+  const setMeta = (attr, val, content) => { const el = document.querySelector('meta[' + attr + '="' + val + '"]'); if (el) el.setAttribute('content', content); };
+  setMeta('name', 'description', seoDesc);
+  setMeta('property', 'og:title', p.swedish_name + ' — ' + p.category + ' | Blomsterlen');
+  setMeta('property', 'og:description', seoDesc);
+  setMeta('property', 'og:url', seoUrl);
+  setMeta('property', 'og:image', seoImg);
+  setMeta('property', 'product:price:amount', String(seoPrice));
+  setMeta('name', 'twitter:title', p.swedish_name + ' — ' + p.category + ' | Blomsterlen');
+  setMeta('name', 'twitter:description', seoDesc);
+  setMeta('name', 'twitter:image', seoImg);
+
+  const canonEl = document.querySelector('link[rel="canonical"]');
+  if (canonEl) canonEl.href = seoUrl;
+
+  // JSON-LD Product + BreadcrumbList
+  const schemaEl = document.getElementById('productSchema');
+  if (schemaEl) {
+    schemaEl.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@graph": [{
+        "@type": "Product",
+        "name": p.swedish_name,
+        "alternateName": p.latin_name,
+        "description": p.catch_phrase || p.description || ('Köp ' + p.swedish_name + ' online från Blomsterlen.'),
+        "image": seoImg,
+        "url": seoUrl,
+        "sku": p.slug,
+        "category": p.category,
+        "brand": { "@type": "Brand", "name": "Blomsterlen" },
+        "offers": {
+          "@type": "Offer",
+          "url": seoUrl,
+          "priceCurrency": "SEK",
+          "price": seoPrice,
+          "priceValidUntil": new Date(Date.now() + 90*86400000).toISOString().split('T')[0],
+          "availability": p.stock_quantity > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          "seller": { "@id": "https://blomsterlen.se/#organization" },
+          "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "SE" },
+            "shippingRate": { "@type": "MonetaryAmount", "value": seoPrice >= 599 ? "0" : "39", "currency": "SEK" }
+          }
+        },
+        "additionalProperty": [
+          p.bloom_color && p.bloom_color !== '-' ? { "@type": "PropertyValue", "name": "Blomfärg", "value": p.bloom_color } : null,
+          p.height_cm ? { "@type": "PropertyValue", "name": "Höjd", "value": p.height_cm + " cm" } : null,
+          p.bloom_time && p.bloom_time !== '-' ? { "@type": "PropertyValue", "name": "Blomtid", "value": p.bloom_time } : null,
+          p.light ? { "@type": "PropertyValue", "name": "Ljusbehov", "value": p.light } : null
+        ].filter(Boolean)
+      }, {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Blomsterlen", "item": "https://blomsterlen.se/" },
+          { "@type": "ListItem", "position": 2, "name": p.category, "item": "https://blomsterlen.se/#products" },
+          { "@type": "ListItem", "position": 3, "name": p.swedish_name, "item": seoUrl }
+        ]
+      }]
+    });
+  }
+  // ── End SEO ──
 
   // Breadcrumb
   document.getElementById('bcCat').textContent = p.category;
