@@ -99,9 +99,9 @@ Deno.serve(async (req) => {
         errors.push(`${recipients[i]}: ${err.message}`);
       }
 
-      // Small delay between sends to respect rate limits
+      // Delay between sends to respect Resend rate limit (max 2/sec)
       if (i < recipients.length - 1) {
-        await new Promise((r) => setTimeout(r, 200));
+        await new Promise((r) => setTimeout(r, 600));
       }
     }
 
