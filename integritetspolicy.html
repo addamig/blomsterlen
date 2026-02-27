@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Integritetspolicy — Blomsterlen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--cream:#FAF7F2;--sage:#8B9E7E;--sl:#C5D4B8;--sd:#5C6E52;--terra:#C4785B;--tl:#E8A98A;--earth:#3D3229;--el:#6B5D50;--petal:#E8D5C8;--pl:#F3EAE3;--w:#FFFFFF;--moss:#2C3E28;--gold:#B8964E;--blush:#F0D9CC;--fd:'Cormorant Garamond',Georgia,serif;--fb:'DM Sans',system-ui,sans-serif}
+html{scroll-behavior:smooth}body{font-family:var(--fb);background:var(--cream);color:var(--earth);-webkit-font-smoothing:antialiased}
+.ann{background:var(--moss);color:var(--sl);text-align:center;padding:10px 20px;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;font-weight:500}.ann span{color:var(--tl)}
+nav{position:sticky;top:0;z-index:1000;background:rgba(250,247,242,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(139,158,126,.15)}.ni{max-width:1440px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:16px 48px}.nl{display:flex;gap:32px}.nl a{text-decoration:none;color:var(--earth);font-size:13px;letter-spacing:1.5px;text-transform:uppercase;font-weight:500;position:relative;transition:color .3s}.nl a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1.5px;background:var(--sage);transition:width .3s}.nl a:hover::after{width:100%}.nl a:hover{color:var(--sd)}
+.logo{font-family:var(--fd);font-size:32px;font-weight:300;color:var(--earth);letter-spacing:3px;text-decoration:none}.logo em{font-style:italic;color:var(--sage);font-weight:400}
+.na{display:flex;gap:20px;align-items:center}.na a{text-decoration:none;color:var(--earth);font-size:13px;letter-spacing:1.5px;text-transform:uppercase;font-family:var(--fb);font-weight:500;transition:color .3s}.na a:hover{color:var(--sd)}
+.hero-sub{position:relative;padding:100px 48px 80px;text-align:center;background:linear-gradient(135deg,var(--cream),var(--pl) 50%,var(--blush));overflow:hidden}
+.hero-sub::before{content:'';position:absolute;inset:0;opacity:.04;background-image:radial-gradient(circle at 30% 40%,var(--sage) 1px,transparent 1px);background-size:50px 50px}
+.shl{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--sd);font-weight:600;margin-bottom:16px;position:relative}
+.hero-sub h1{font-family:var(--fd);font-size:clamp(40px,5vw,68px);font-weight:300;color:var(--earth);line-height:1.1;margin-bottom:20px;position:relative}
+.hero-sub h1 em{font-style:italic;color:var(--sage);font-weight:400}
+.hero-sub p{font-size:16px;color:var(--el);max-width:520px;margin:0 auto;line-height:1.7;position:relative}
+
+.policy{max-width:780px;margin:0 auto;padding:60px 48px 80px}
+.policy h2{font-family:var(--fd);font-size:28px;font-weight:400;color:var(--earth);margin:48px 0 16px;padding-top:32px;border-top:1px solid var(--pl)}
+.policy h2:first-of-type{border-top:none;margin-top:0;padding-top:0}
+.policy h3{font-family:var(--fd);font-size:20px;font-weight:500;color:var(--earth);margin:28px 0 10px}
+.policy p{font-size:15px;line-height:1.8;color:var(--el);margin-bottom:16px}
+.policy ul{margin:0 0 16px 20px;list-style:none}
+.policy ul li{font-size:15px;line-height:1.8;color:var(--el);padding:4px 0;position:relative;padding-left:20px}
+.policy ul li::before{content:'🌿';position:absolute;left:0;font-size:12px}
+.policy a{color:var(--sd);text-decoration:none;font-weight:500;border-bottom:1px solid rgba(92,110,82,.2);transition:border-color .3s}
+.policy a:hover{border-color:var(--sd)}
+.policy .updated{font-size:13px;color:var(--sage);font-weight:500;margin-bottom:32px}
+
+.policy .highlight{background:var(--pl);border-radius:12px;padding:24px 28px;margin:24px 0}
+.policy .highlight p{margin:0}
+
+footer{background:var(--earth);color:rgba(250,247,242,.6);padding:60px 48px 36px}.fti{max-width:1440px;margin:0 auto}.ftt{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}.ftb p{font-size:14px;line-height:1.7;margin-top:12px;max-width:280px}.fc h4{font-family:var(--fd);font-size:17px;font-weight:500;color:var(--cream);margin-bottom:16px}.fc a{display:block;font-size:13px;color:rgba(250,247,242,.5);text-decoration:none;padding:4px 0;transition:color .3s}.fc a:hover{color:var(--cream)}.ftbo{display:flex;justify-content:space-between;align-items:center;padding-top:28px;border-top:1px solid rgba(250,247,242,.1);font-size:12px}.fps{display:flex;gap:16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;opacity:.5}
+
+@media(max-width:1024px){.ftt{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){.ni{padding:14px 20px}.nl{display:none}.hero-sub{padding:60px 20px 50px}.policy{padding:40px 20px 60px}footer{padding:40px 20px 28px}.ftt{grid-template-columns:1fr;gap:28px}.ftbo{flex-direction:column;gap:14px;text-align:center}}
+</style>
+</head>
+<body>
+
+<div class="ann">🌿 Fri frakt vid köp över <span>599 kr</span> — Fräschhetsgaranti på alla växter</div>
+
+<nav><div class="ni">
+<div class="nl"><a href="index.html#categories">Kategorier</a><a href="index.html#products">Alla växter</a><a href="om-oss.html">Om oss</a><a href="kundservice.html">Kundservice</a></div>
+<a href="index.html" class="logo">Blomster<em>len</em></a>
+<div class="na"><a href="index.html">Tillbaka till butiken</a></div>
+</div></nav>
+
+<div class="hero-sub">
+<div class="shl">Juridiskt</div>
+<h1>Integritets<em>policy</em></h1>
+<p>Så hanterar vi dina personuppgifter. Vi värnar om din integritet och följer GDPR.</p>
+</div>
+
+<div class="policy">
+<p class="updated">Senast uppdaterad: 27 februari 2026</p>
+
+<h2>1. Personuppgiftsansvarig</h2>
+<p>Blomsterlen AB (org.nr: [ange ert organisationsnummer]) är personuppgiftsansvarig för behandlingen av dina personuppgifter. Du kan alltid kontakta oss via:</p>
+<ul>
+<li>E-post: info@blomsterlen.se</li>
+<li>Adress: Lackalänga Trädgård, Skåne</li>
+</ul>
+
+<h2>2. Vilka uppgifter samlar vi in?</h2>
+
+<h3>Vid köp</h3>
+<p>När du genomför ett köp samlar vi in de uppgifter som krävs för att fullfölja din beställning:</p>
+<ul>
+<li>Namn, e-postadress och telefonnummer</li>
+<li>Leveransadress (gatuadress, postnummer, ort)</li>
+<li>Betaluppgifter hanteras av Stripe och/eller Klarna — vi lagrar aldrig dina kortuppgifter</li>
+</ul>
+
+<h3>Vid kontakt</h3>
+<p>Om du kontaktar oss via e-post eller kundservice sparar vi din e-postadress och det du skriver för att kunna hjälpa dig.</p>
+
+<h3>Teknisk data</h3>
+<div class="highlight">
+<p>Vi använder <strong>inga spårningscookies, inget Google Analytics och ingen tredjepartstracking</strong>. Vi samlar inte in IP-adresser, enhetsinfo eller surfhistorik. Din varukorg och önskelista sparas lokalt i din webbläsare (localStorage) och skickas aldrig till oss.</p>
+</div>
+
+<h2>3. Varför behandlar vi dina uppgifter?</h2>
+<p>Vi behandlar dina personuppgifter för följande ändamål:</p>
+<ul>
+<li><strong>Fullfölja köp</strong> — Leverera dina beställda växter, skicka orderbekräftelse, hantera frakt (rättslig grund: avtal)</li>
+<li><strong>Kundservice</strong> — Besvara frågor och hantera reklamationer (rättslig grund: berättigat intresse)</li>
+<li><strong>Bokföring</strong> — Spara orderinformation enligt bokföringslagen (rättslig grund: rättslig förpliktelse)</li>
+</ul>
+
+<h2>4. Cookies och lokal lagring</h2>
+<p>Vi använder följande lokala lagring i din webbläsare:</p>
+<ul>
+<li><strong>blomsterlen_cart</strong> — Din varukorg (nödvändig för att handla)</li>
+<li><strong>blomsterlen_wl</strong> — Din önskelista (nödvändig för att spara favoriter)</li>
+<li><strong>blomsterlen_cookies</strong> — Om du sett cookie-bannern</li>
+</ul>
+<p>Dessa är nödvändiga för att webbplatsen ska fungera och kräver inget samtycke enligt GDPR. Vi använder inga tredjepartscookies.</p>
+
+<h2>5. Vilka delar vi data med?</h2>
+<p>Vi delar dina uppgifter med följande parter — och bara det som krävs för att fullfölja köpet:</p>
+<ul>
+<li><strong>Stripe</strong> — Betalningshantering (kortbetalning, Klarna). <a href="https://stripe.com/privacy" target="_blank">Stripes integritetspolicy</a></li>
+<li><strong>Resend</strong> — Utskick av orderbekräftelse via e-post. <a href="https://resend.com/legal/privacy-policy" target="_blank">Resends integritetspolicy</a></li>
+<li><strong>Supabase</strong> — Databaslagring (EU-baserad). <a href="https://supabase.com/privacy" target="_blank">Supabases integritetspolicy</a></li>
+<li><strong>PostNord</strong> — Leverans av växter</li>
+</ul>
+<p>Vi säljer aldrig dina uppgifter till tredje part och använder dem aldrig i marknadsföringssyfte.</p>
+
+<h2>6. Hur länge sparar vi data?</h2>
+<ul>
+<li><strong>Orderuppgifter</strong> — 7 år (bokföringslagens krav)</li>
+<li><strong>Kundservice-korrespondens</strong> — 24 månader</li>
+<li><strong>Lokal lagring</strong> — Tills du rensar din webbläsare</li>
+</ul>
+
+<h2>7. Dina rättigheter</h2>
+<p>Enligt GDPR har du rätt att:</p>
+<ul>
+<li><strong>Få tillgång</strong> till de personuppgifter vi har om dig</li>
+<li><strong>Rätta</strong> felaktiga uppgifter</li>
+<li><strong>Radera</strong> dina uppgifter (utom det vi måste spara enligt lag)</li>
+<li><strong>Begränsa</strong> behandlingen</li>
+<li><strong>Flytta</strong> dina uppgifter (dataportabilitet)</li>
+<li><strong>Invända</strong> mot behandling baserad på berättigat intresse</li>
+</ul>
+<p>Kontakta oss på info@blomsterlen.se för att utöva dina rättigheter. Vi besvarar alla förfrågningar inom 30 dagar.</p>
+<p>Du har även rätt att lämna klagomål till <a href="https://www.imy.se" target="_blank">Integritetsskyddsmyndigheten (IMY)</a>.</p>
+
+<h2>8. Säkerhet</h2>
+<p>Vi vidtar tekniska och organisatoriska åtgärder för att skydda dina uppgifter. All kommunikation med vår webbplats sker via HTTPS-kryptering. Betalningar hanteras av PCI-certifierade tjänsteleverantörer (Stripe). Vi lagrar aldrig dina kortuppgifter.</p>
+
+<h2>9. Ändringar</h2>
+<p>Vi kan komma att uppdatera denna integritetspolicy. Vid väsentliga ändringar meddelar vi dig via e-post eller på webbplatsen. Senaste versionen finns alltid här.</p>
+</div>
+
+<footer><div class="fti"><div class="ftt">
+<div class="ftb"><a href="index.html" class="logo">Blomster<em>len</em></a><p>Handplockade perenner, gräs, ormbunkar och kryddväxter från utvalda svenska odlare.</p></div>
+<div class="fc"><h4>Kategorier</h4><a href="index.html#products">Perenner</a><a href="index.html#products">Prydnadsgräs</a><a href="index.html#products">Ormbunkar</a><a href="index.html#products">Kryddväxter</a></div>
+<div class="fc"><h4>Kundservice</h4><a href="kundservice.html">Kontakta oss</a><a href="kundservice.html#frakt">Frakt</a><a href="kundservice.html#returer">Returer</a><a href="kundservice.html#faq">FAQ</a></div>
+<div class="fc"><h4>Om oss</h4><a href="om-oss.html">Om Blomsterlen</a><a href="om-oss.html#hallbarhet">Hållbarhet</a><a href="integritetspolicy.html">Integritetspolicy</a></div>
+</div><div class="ftbo"><span>© 2026 Blomsterlen AB</span><div class="fps"><span>Visa</span><span>Mastercard</span><span>Klarna</span><span>Swish</span></div></div></div></footer>
+
+</body>
+</html>
