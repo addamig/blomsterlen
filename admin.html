@@ -201,7 +201,7 @@
 
 <script>
 const SB_URL='https://jymaudfvcfhmjnfxucbk.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bWF1ZGZ2Y2ZobWpuZnh1Y2JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwMTczNTgsImV4cCI6MjA4NzU5MzM1OH0.4vDzNh4LZyCI3aCPbaThaNSvOUh3R0eZa5-BClrEdB4';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bWF1ZGZ2Y2ZobWpuZnh1Y2JrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjAxNzM1OCwiZXhwIjoyMDg3NTkzMzU4fQ.uapgTIkJDdTe3XSo-JpPlcE_kX7nvIwJA2e0WQvbyyI';
 const HASH='d1ce9052bd13507c0ee03164bf8fa816846ef8ee96be2c534fb55046e3b74f24';
 let db;
 
@@ -270,13 +270,13 @@ async function refreshAll(){
         document.getElementById('s-c').textContent=cl;
         document.getElementById('bc').textContent=cl;
 
-        const rev=ol.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+(o.total_amount||0),0);
+        const rev=ol.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+(o.total_incl_vat||0),0);
         document.getElementById('s-r').textContent=F(rev);
         document.getElementById('s-rs').textContent=ol.length?`${ol.filter(o=>['paid','completed','shipped'].includes(o.status)).length} betalda`:'';
 
         const tb=document.getElementById('d-orders');
         if(!ol.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:32px">Inga ordrar ännu</td></tr>';return}
-        tb.innerHTML=ol.slice(0,8).map(o=>`<tr><td><span class="np">#${(o.id||'').slice(0,8)}</span></td><td>${E(o.customer_name||o.customer_email||'–')}</td><td>${F(o.total_amount)}</td><td>${SB(o.status)}</td><td>${D(o.created_at)}</td></tr>`).join('');
+        tb.innerHTML=ol.slice(0,8).map(o=>`<tr><td><span class="np">#${(o.id||'').slice(0,8)}</span></td><td>${E(o.shipping_name||o.email||'–')}</td><td>${F(o.total_incl_vat)}</td><td>${SB(o.status)}</td><td>${D(o.created_at)}</td></tr>`).join('');
     }catch(e){console.error(e);toast('Dashboard-fel: '+e.message,'err')}
 }
 
@@ -377,7 +377,7 @@ async function loadO(){
 
 function fO(){
     const q=document.getElementById('o-q').value.toLowerCase(),st=document.getElementById('o-st').value;op=0;
-    rO(AO.filter(o=>{const t=`${o.id} ${o.customer_name||''} ${o.customer_email||''}`.toLowerCase();return(!q||t.includes(q))&&(!st||o.status===st)}));
+    rO(AO.filter(o=>{const t=`${o.id} ${o.shipping_name||''} ${o.email||''}`.toLowerCase();return(!q||t.includes(q))&&(!st||o.status===st)}));
 }
 
 function rO(list){
@@ -388,8 +388,8 @@ function rO(list){
     if(!page.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px">Inga ordrar</td></tr>';return}
     tb.innerHTML=page.map(o=>`<tr>
         <td><span class="np">#${(o.id||'').slice(0,8)}</span></td>
-        <td>${E(o.customer_name||'–')}</td><td>${E(o.customer_email||'–')}</td>
-        <td>${F(o.total_amount)}</td><td>${SB(o.status)}</td><td>${D(o.created_at)}</td>
+        <td>${E(o.shipping_name||'–')}</td><td>${E(o.email||'–')}</td>
+        <td>${F(o.total_incl_vat)}</td><td>${SB(o.status)}</td><td>${D(o.created_at)}</td>
         <td><div class="ac"><button class="ab" onclick="viewO('${o.id}')">👁</button><button class="ab" onclick="openOM('${o.id}')">📝</button></div></td>
     </tr>`).join('');
     PG('o-pg',t,op,pg=>{op=pg;rO(list)});
@@ -401,10 +401,10 @@ async function viewO(id){
     document.getElementById('o-detail').innerHTML=`<div class="dp">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><h3 style="font-size:16px">Order #${id.slice(0,8)}</h3><button class="btn btn-s btn-sm" onclick="document.getElementById('o-detail').innerHTML=''">Stäng</button></div>
         <div class="dg">
-            <div class="ds"><h4>Kund</h4><div class="dr"><span class="l">Namn</span><span class="v">${E(o.customer_name||'–')}</span></div><div class="dr"><span class="l">E-post</span><span class="v">${E(o.customer_email||'–')}</span></div><div class="dr"><span class="l">Telefon</span><span class="v">${E(o.customer_phone||'–')}</span></div></div>
-            <div class="ds"><h4>Detaljer</h4><div class="dr"><span class="l">Status</span><span class="v">${SB(o.status)}</span></div><div class="dr"><span class="l">Summa</span><span class="v">${F(o.total_amount)}</span></div><div class="dr"><span class="l">Skapad</span><span class="v">${DT(o.created_at)}</span></div>${o.stripe_session_id?`<div class="dr"><span class="l">Stripe</span><span class="v" style="font-size:11px;font-family:monospace">${o.stripe_session_id.slice(0,24)}…</span></div>`:''}</div>
+            <div class="ds"><h4>Kund</h4><div class="dr"><span class="l">Namn</span><span class="v">${E(o.shipping_name||'–')}</span></div><div class="dr"><span class="l">E-post</span><span class="v">${E(o.email||'–')}</span></div><div class="dr"><span class="l">Telefon</span><span class="v">${E(o.phone||'–')}</span></div></div>
+            <div class="ds"><h4>Detaljer</h4><div class="dr"><span class="l">Status</span><span class="v">${SB(o.status)}</span></div><div class="dr"><span class="l">Summa</span><span class="v">${F(o.total_incl_vat)}</span></div><div class="dr"><span class="l">Skapad</span><span class="v">${DT(o.created_at)}</span></div>${o.stripe_session_id?`<div class="dr"><span class="l">Stripe</span><span class="v" style="font-size:11px;font-family:monospace">${o.stripe_session_id.slice(0,24)}…</span></div>`:''}</div>
         </div>
-        ${items.length?`<div style="margin-top:20px"><h4 style="font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:12px">Rader</h4><table><thead><tr><th>Produkt</th><th>Antal</th><th>Á-pris</th><th>Summa</th></tr></thead><tbody>${items.map(i=>`<tr><td>${E(i.product_name||'–')}</td><td>${i.quantity}</td><td>${F(i.unit_price)}</td><td>${F(i.quantity*i.unit_price)}</td></tr>`).join('')}</tbody></table></div>`:''}
+        ${items.length?`<div style="margin-top:20px"><h4 style="font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:12px">Rader</h4><table><thead><tr><th>Produkt</th><th>Antal</th><th>Á-pris</th><th>Summa</th></tr></thead><tbody>${items.map(i=>`<tr><td>${E(i.product_name||i.swedish_name||'–')}</td><td>${i.quantity}</td><td>${F(i.unit_price)}</td><td>${F(i.quantity*i.unit_price)}</td></tr>`).join('')}</tbody></table></div>`:''}
     </div>`;
     document.getElementById('o-detail').scrollIntoView({behavior:'smooth'});
 }
@@ -412,7 +412,7 @@ async function viewO(id){
 function openOM(id){
     const o=AO.find(x=>x.id===id);if(!o)return;
     document.getElementById('om-id').value=id;
-    document.getElementById('om-ref').textContent=`#${id.slice(0,8)} – ${o.customer_name||'Okänd'}`;
+    document.getElementById('om-ref').textContent=`#${id.slice(0,8)} – ${o.shipping_name||'Okänd'}`;
     document.getElementById('om-st').value=o.status||'pending';
     document.getElementById('om-modal').classList.add('on');
 }
