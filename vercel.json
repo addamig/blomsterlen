@@ -1,0 +1,26 @@
+{
+  "rewrites": [
+    {
+      "source": "/vaxter/:slug",
+      "destination": "/produkt.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/produkt.html",
+      "has": [{ "type": "query", "key": "slug", "value": "(?<slug>.*)" }],
+      "destination": "/vaxter/:slug",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/sitemap.xml",
+      "headers": [{ "key": "Content-Type", "value": "application/xml" }]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [{ "key": "Content-Type", "value": "text/plain" }]
+    }
+  ]
+}

@@ -363,7 +363,7 @@ function loadCategoryImages() {
     if (fi) { fi.innerHTML = ''; fi.style.backgroundImage = 'url(' + feat.img + ')'; fi.style.backgroundSize = 'cover'; fi.style.backgroundPosition = 'center'; }
     // Update the featured button to use correct ID and link
     const fb = document.getElementById('featBtn');
-    if (fb) { fb.setAttribute('onclick', "navigateTo('produkt.html#" + feat.slug + "')"); }
+    if (fb) { fb.setAttribute('onclick', "navigateTo('/vaxter/" + feat.slug + "')"); }
   }
 }
 
@@ -394,7 +394,7 @@ function render() {
     const imgHtml = p.img
       ? `<img class="pimg" src="${p.img}" alt="${p.n}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div class="pe" style="display:none">${ge(p.c, p.n)}</div>`
       : `<div class="pe">${ge(p.c, p.n)}</div>`;
-    return `<div class="pcard" onclick="navigateTo('produkt.html#${p.slug}')"><div class="piw" style="background:${gb(p.c)}">
+    return `<div class="pcard" onclick="navigateTo('/vaxter/${p.slug}')"><div class="piw" style="background:${gb(p.c)}">
 ${imgHtml}
 <span class="pbdg ${bc(p.c)}">${p.c}</span>
 <button class="pw ${wl.has(p.id) ? 'act' : ''}" data-wl="${p.id}" onclick="event.stopPropagation();tw('${p.id}')">${wl.has(p.id) ? '♥' : '♡'}</button>
@@ -420,7 +420,7 @@ function handleSearch(q) {
     const thumbHtml = p.img
       ? `<img src="${p.img}" style="width:40px;height:40px;border-radius:8px;object-fit:cover" alt="">`
       : `<div style="width:40px;height:40px;border-radius:8px;background:${gb(p.c)};display:flex;align-items:center;justify-content:center;font-size:18px">${ge(p.c, p.n)}</div>`;
-    return `<div class="sri" onclick="closeSearch();navigateTo('produkt.html#${p.slug}')">${thumbHtml}<div><div style="font-weight:500;font-size:14px">${p.n}</div><div style="font-size:12px;color:var(--el);font-style:italic">${p.l}</div></div><span class="sr-cat" style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--sage);font-weight:600;background:var(--pl);padding:3px 8px;border-radius:20px;white-space:nowrap;margin-left:auto">${p.c}</span><span style="font-weight:600;font-size:14px;white-space:nowrap;margin-left:12px">${p.p} kr</span></div>`;
+    return `<div class="sri" onclick="closeSearch();navigateTo('/vaxter/${p.slug}')">${thumbHtml}<div><div style="font-weight:500;font-size:14px">${p.n}</div><div style="font-size:12px;color:var(--el);font-style:italic">${p.l}</div></div><span class="sr-cat" style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--sage);font-weight:600;background:var(--pl);padding:3px 8px;border-radius:20px;white-space:nowrap;margin-left:auto">${p.c}</span><span style="font-weight:600;font-size:14px;white-space:nowrap;margin-left:12px">${p.p} kr</span></div>`;
   }).join('') : '<div style="padding:20px;text-align:center;color:var(--el);font-size:14px">Inga resultat</div>';
 }
 

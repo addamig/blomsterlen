@@ -386,7 +386,7 @@ function renderProduct(p) {
   // ── Dynamic SEO ──
   const seoPrice = Math.round(p.retail_price_incl_vat);
   const seoImg = p.image_url || 'https://blomsterlen.se/og-image.jpg';
-  const seoUrl = `https://blomsterlen.se/produkt.html#${p.slug}`;
+  const seoUrl = `https://blomsterlen.se/vaxter/${p.slug}`;
   const seoDesc = `${p.swedish_name} (${p.latin_name}) — ${p.category}. ${p.bloom_color && p.bloom_color !== '-' ? 'Blomfärg: ' + p.bloom_color + '. ' : ''}${p.height_cm ? 'Höjd: ' + p.height_cm + ' cm. ' : ''}${seoPrice} kr inkl. moms. Köp online från Blomsterlen.`;
 
   const setMeta = (attr, val, content) => { const el = document.querySelector('meta[' + attr + '="' + val + '"]'); if (el) el.setAttribute('content', content); };
@@ -580,17 +580,9 @@ ${imgHtml}
 }
 
 function goToProduct(slug) {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
   document.body.classList.add('leaving');
-  setTimeout(async () => {
-    window.location.hash = slug;
-    document.body.classList.remove('leaving');
-    const wrap = document.getElementById('pdWrap');
-    if (wrap) wrap.style.display = 'none';
-    const loading = document.getElementById('loadingState');
-    if (loading) { loading.style.display = 'flex'; loading.innerHTML = '<div class="loader"></div>'; }
-    await init();
-    document.body.classList.add('ready');
+  setTimeout(() => {
+    window.location.href = '/vaxter/' + encodeURIComponent(slug);
   }, 250);
 }
 
@@ -697,8 +689,25 @@ window.addEventListener('scroll', () => {
 
 // ── Boot ──
 async function init() {
-  let slug = window.location.hash.slice(1);
-  try { slug = decodeURIComponent(slug); } catch(e) {}
+  // Read slug from: 1) meta tag (injected by middleware), 2) URL path /vaxter/slug, 3) hash #slug
+  let slug = '';
+  const metaSlug = document.querySelector('meta[name="product-slug"]');
+  if (metaSlug) {
+    slug = metaSlug.content;
+  } else {
+    const pathMatch = window.location.pathname.match(/\/vaxter\/(.+)/);
+    if (pathMatch) {
+      slug = decodeURIComponent(pathMatch[1]);
+    } else {
+      slug = window.location.hash.slice(1);
+      try { slug = decodeURIComponent(slug); } catch(e) {}
+      // Redirect old hash URLs to clean URLs
+      if (slug) {
+        window.location.replace('/vaxter/' + encodeURIComponent(slug));
+        return;
+      }
+    }
+  }
   if (!slug) { navigateTo('index.html'); return; }
 
   loadCart();
@@ -711,7 +720,7 @@ async function init() {
       <div style="font-size:64px;margin-bottom:20px">🌿</div>
       <h2 style="font-family:var(--fd);font-size:28px;font-weight:300;margin-bottom:12px">Växten hittades inte</h2>
       <p style="color:var(--el);margin-bottom:24px">Vi kunde inte hitta den begärda produkten.</p>
-      <a href="#" onclick="event.preventDefault();navigateTo('index.html#products')" style="color:var(--sd);font-weight:500">← Tillbaka till alla växter</a>
+      <a href="/" style="color:var(--sd);font-weight:500">← Tillbaka till alla växter</a>
     `;
     return;
   }
