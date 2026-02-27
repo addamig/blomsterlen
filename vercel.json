@@ -2,15 +2,7 @@
   "rewrites": [
     {
       "source": "/vaxter/:slug",
-      "destination": "/produkt.html"
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/produkt.html",
-      "has": [{ "type": "query", "key": "slug", "value": "(?<slug>.*)" }],
-      "destination": "/vaxter/:slug",
-      "permanent": true
+      "destination": "/api/vaxter/:slug"
     }
   ],
   "headers": [
