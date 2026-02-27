@@ -219,7 +219,25 @@ body{opacity:0;transition:opacity .35s ease}body.ready{opacity:1}body.leaving{op
 <section class="nl2 rev"><div class="nb">
 <h2 class="nbt">Få 10% rabatt på första ordern</h2>
 <p class="nbd">Prenumerera för skötselråd, nyheter och erbjudanden.</p>
-<form class="nf" onsubmit="event.preventDefault();notify('Tack! Kolla din inkorg 🌱')"><input type="email" class="nfi" placeholder="Din e-postadress" required><button type="submit" class="nfb">Prenumerera</button></form>
+<form class="nf" onsubmit="event.preventDefault();subscribeNewsletter(this)"><input type="email" class="nfi" id="nl-email" placeholder="Din e-postadress" required><button type="submit" class="nfb" id="nl-btn">Prenumerera</button></form>
+<script>
+async function subscribeNewsletter(form){
+  const btn=document.getElementById('nl-btn');
+  const email=document.getElementById('nl-email').value.trim();
+  if(!email)return;
+  btn.textContent='Skickar…';btn.disabled=true;
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/newsletter_subscribers`,{
+      method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({email,source:'website'})
+    });
+    if(res.ok){notify('Tack för din prenumeration! 🌱');document.getElementById('nl-email').value=''}
+    else if(res.status===409||res.status===400){notify('Du prenumererar redan — kul! 🌿')}
+    else{notify('Något gick fel, försök igen.')}
+  }catch(e){notify('Något gick fel, försök igen.')}
+  btn.textContent='Prenumerera';btn.disabled=false;
+}
+</script>
 </div></section>
 
 <footer><div class="fti"><div class="ftt">
