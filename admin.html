@@ -74,6 +74,121 @@ async function delN(id,email){
     if(!confirm('Ta bort '+email+'?'))return;
     try{const{error}=await db.from('newsletter_subscribers').delete().eq('id',id);if(error)throw error;toast('Borttagen');nL=false;await loadN();refreshAll()}catch(e){toast('Fel: '+e.message,'err')}
 }
+
+
+// ═══ SEND NEWSLETTER ═══
+function initSendView(){
+    updateRecipientCount();
+    previewNL();
+}
+
+async function updateRecipientCount(){
+    try{
+        const{data}=await db.from('newsletter_subscribers').select('id').eq('is_active',true);
+        const cnt=(data||[]).length;
+        document.getElementById('nl-recipient-count').textContent=`${cnt} aktiva prenumeranter`;
+    }catch(e){}
+}
+
+function buildNLHtml(){
+    const heading=document.getElementById('nl-heading').value.trim()||'Nytt från Blomsterlen';
+    const body=(document.getElementById('nl-body').value||'').replace(/\n/g,'<br>');
+    const cta=document.getElementById('nl-cta').value.trim();
+    const ctaUrl=document.getElementById('nl-cta-url').value.trim()||'https://blomsterlen.se';
+
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#FAF7F2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+<div style="max-width:600px;margin:0 auto;padding:20px">
+  <div style="text-align:center;padding:40px 0 32px">
+    <div style="font-family:Georgia,'Times New Roman',serif;font-size:28px;color:#3D3229;letter-spacing:1px;margin-bottom:8px">blomsterlen</div>
+    <div style="width:40px;height:2px;background:#8B9E7E;margin:0 auto"></div>
+  </div>
+  <div style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(61,50,41,.06)">
+    <div style="background:#8B9E7E;padding:32px;text-align:center">
+      <div style="color:#ffffff;font-size:24px;font-family:Georgia,'Times New Roman',serif">${heading}</div>
+    </div>
+    <div style="padding:32px">
+      <div style="color:#3D3229;font-size:15px;line-height:1.8">${body}</div>
+      ${cta?`<div style="text-align:center;margin-top:32px"><a href="${ctaUrl}" style="display:inline-block;background:#8B9E7E;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px">${cta}</a></div>`:''}
+    </div>
+  </div>
+  <div style="text-align:center;padding:32px 0">
+    <div style="margin-bottom:12px"><a href="https://blomsterlen.se" style="color:#8B9E7E;text-decoration:none;font-size:13px">blomsterlen.se</a></div>
+    <div style="color:#b5ada4;font-size:11px;line-height:1.6">Blomsterlen — Perenner från Lackalänga Trädgård<br>Du får detta mail för att du prenumererar på vårt nyhetsbrev.</div>
+  </div>
+</div></body></html>`;
+}
+
+function previewNL(){
+    const html=buildNLHtml();
+    const iframe=document.getElementById('nl-preview');
+    iframe.srcdoc=html;
+}
+
+// Auto-preview on input
+['nl-heading','nl-body','nl-cta','nl-cta-url'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.addEventListener('input',()=>previewNL());
+});
+
+async function sendTestNL(){
+    const subject=document.getElementById('nl-subject').value.trim();
+    if(!subject){toast('Ange en ämnesrad','err');return}
+    const html=buildNLHtml();
+    const st=document.getElementById('nl-status');
+    st.textContent='Skickar testmail till richard@addamig.se…';
+
+    try{
+        const res=await fetch(SUPABASE_URL+'/functions/v1/send-newsletter',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},
+            body:JSON.stringify({subject:'[TEST] '+subject,html,test_email:'richard@addamig.se'})
+        });
+        const data=await res.json();
+        if(data.success){st.innerHTML='<span style="color:var(--ok)">✓ Testmail skickat till richard@addamig.se</span>';toast('Testmail skickat!')}
+        else{st.innerHTML='<span style="color:var(--danger)">✗ '+E(data.error||'Okänt fel')+'</span>';toast(data.error||'Fel','err')}
+    }catch(e){st.innerHTML='<span style="color:var(--danger)">✗ '+E(e.message)+'</span>';toast('Nätverksfel','err')}
+}
+
+async function sendNL(){
+    const subject=document.getElementById('nl-subject').value.trim();
+    const body=document.getElementById('nl-body').value.trim();
+    if(!subject){toast('Ange en ämnesrad','err');return}
+    if(!body){toast('Skriv ett meddelande','err');return}
+
+    // Get count first
+    const{data:subs}=await db.from('newsletter_subscribers').select('id').eq('is_active',true);
+    const cnt=(subs||[]).length;
+    if(cnt===0){toast('Inga aktiva prenumeranter','err');return}
+
+    if(!confirm(`Skicka nyhetsbrevet "${subject}" till ${cnt} prenumeranter?`))return;
+
+    const btn=document.getElementById('nl-send-btn');
+    btn.disabled=true;btn.textContent='Skickar…';
+    const st=document.getElementById('nl-status');
+    st.textContent=`Skickar till ${cnt} mottagare…`;
+
+    try{
+        const res=await fetch(SUPABASE_URL+'/functions/v1/send-newsletter',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},
+            body:JSON.stringify({subject,html:buildNLHtml()})
+        });
+        const data=await res.json();
+        if(data.success){
+            st.innerHTML=`<span style="color:var(--ok)">✓ Skickat till ${data.sent} mottagare!</span>`;
+            toast(`Nyhetsbrev skickat till ${data.sent} mottagare!`);
+        }else{
+            st.innerHTML='<span style="color:var(--danger)">✗ '+(data.error||'Okänt fel')+'</span>';
+            toast(data.error||'Fel vid utskick','err');
+        }
+    }catch(e){st.innerHTML='<span style="color:var(--danger)">✗ '+e.message+'</span>';toast('Nätverksfel','err')}
+
+    btn.disabled=false;btn.textContent='🚀 Skicka till alla';
+}
+
+// Store SUPABASE_URL for edge function calls
+const SUPABASE_URL=SB_URL;
 </script>
     <style>
         :root{--bg:#0f110f;--bg-card:#181a18;--bg-hover:#1e211e;--bg-input:#1c1f1c;--border:#2a2d2a;--border-focus:#4a7c59;--text:#e8e6e1;--dim:#8a8880;--muted:#5a5850;--accent:#5b9a6a;--accent-h:#6db47e;--accent-bg:rgba(91,154,106,.1);--danger:#c45c5c;--danger-bg:rgba(196,92,92,.1);--warn:#c4a35c;--warn-bg:rgba(196,163,92,.1);--ok:#5b9a6a;--ok-bg:rgba(91,154,106,.15);--r:8px;--rl:12px}
@@ -184,6 +299,7 @@ async function delN(id,email){
         <div class="nav-item" data-s="customers" onclick="nav('customers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Kunder</span><span class="nav-badge" id="bc">–</span></div>
         <div class="nav-item" data-s="stock" onclick="nav('stock')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg><span>Lagersaldo</span></div>
         <div class="nav-item" data-s="newsletter" onclick="nav('newsletter')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>Nyhetsbrev</span><span class="nav-badge" id="bn">–</span></div>
+        <div class="nav-item" data-s="send" onclick="nav('send')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Skicka utskick</span></div>
     </div>
     <div class="side-foot"><button onclick="logout()">Logga ut</button></div>
 </nav>
@@ -262,6 +378,43 @@ async function delN(id,email){
 </div>
 </div>
 
+
+<!-- SEND NEWSLETTER -->
+<div class="sec" id="sec-send">
+    <div class="ph"><div class="pt">Skicka nyhetsbrev</div></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <!-- Left: Editor -->
+        <div>
+            <div class="sc" style="padding:24px">
+                <div class="fi" style="margin-bottom:16px"><label>Ämnesrad</label><input id="nl-subject" placeholder="T.ex. Vårens nyheter från Blomsterlen 🌷"></div>
+                <div class="fi" style="margin-bottom:16px"><label>Rubrik</label><input id="nl-heading" placeholder="Rubrik i mailet" value="Nytt från Blomsterlen"></div>
+                <div class="fi" style="margin-bottom:16px"><label>Brödtext</label><textarea id="nl-body" style="min-height:200px" placeholder="Skriv ditt nyhetsbrev här..."></textarea></div>
+                <div class="fi" style="margin-bottom:16px"><label>Knapptext (valfritt)</label><input id="nl-cta" placeholder="T.ex. Se alla nyheter →"></div>
+                <div class="fi" style="margin-bottom:16px"><label>Knapplänk</label><input id="nl-cta-url" placeholder="https://blomsterlen.se" value="https://blomsterlen.se"></div>
+
+                <div style="display:flex;gap:12px;margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+                    <button class="btn btn-s" onclick="previewNL()">👁 Förhandsgranska</button>
+                    <button class="btn btn-s" onclick="sendTestNL()">📧 Skicka testmail</button>
+                    <button class="btn btn-p" onclick="sendNL()" id="nl-send-btn">🚀 Skicka till alla</button>
+                </div>
+                <div id="nl-status" style="margin-top:12px;font-size:13px;color:var(--dim)"></div>
+            </div>
+        </div>
+
+        <!-- Right: Preview -->
+        <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <span style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600">Förhandsgranskning</span>
+                <span style="font-size:12px;color:var(--dim)" id="nl-recipient-count"></span>
+            </div>
+            <div style="background:#FAF7F2;border-radius:var(--rl);overflow:hidden;border:1px solid var(--border)">
+                <iframe id="nl-preview" style="width:100%;height:600px;border:none;background:#FAF7F2"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- NEWSLETTER MODAL -->
 <div class="mo" id="nm-modal"><div class="md" style="max-width:420px"><h3 id="nm-title">Ny prenumerant</h3>
 <input type="hidden" id="nm-id">
@@ -322,7 +475,7 @@ function nav(n){
     document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('on'));
     document.getElementById('sec-'+n)?.classList.add('on');
     document.querySelector(`.nav-item[data-s="${n}"]`)?.classList.add('on');
-    if(n==='products'&&!pL)loadP();if(n==='orders'&&!oL)loadO();if(n==='customers'&&!cL)loadC();if(n==='stock')loadStock();if(n==='newsletter'&&!nL)loadN();
+    if(n==='products'&&!pL)loadP();if(n==='orders'&&!oL)loadO();if(n==='customers'&&!cL)loadC();if(n==='stock')loadStock();if(n==='newsletter'&&!nL)loadN();if(n==='send')initSendView();
 }
 
 function toast(m,t='ok'){const e=document.createElement('div');e.className=`toast t-${t}`;e.textContent=m;document.getElementById('toasts').appendChild(e);setTimeout(()=>e.remove(),4000)}
@@ -648,6 +801,121 @@ async function delN(id,email){
     if(!confirm('Ta bort '+email+'?'))return;
     try{const{error}=await db.from('newsletter_subscribers').delete().eq('id',id);if(error)throw error;toast('Borttagen');nL=false;await loadN();refreshAll()}catch(e){toast('Fel: '+e.message,'err')}
 }
+
+
+// ═══ SEND NEWSLETTER ═══
+function initSendView(){
+    updateRecipientCount();
+    previewNL();
+}
+
+async function updateRecipientCount(){
+    try{
+        const{data}=await db.from('newsletter_subscribers').select('id').eq('is_active',true);
+        const cnt=(data||[]).length;
+        document.getElementById('nl-recipient-count').textContent=`${cnt} aktiva prenumeranter`;
+    }catch(e){}
+}
+
+function buildNLHtml(){
+    const heading=document.getElementById('nl-heading').value.trim()||'Nytt från Blomsterlen';
+    const body=(document.getElementById('nl-body').value||'').replace(/\n/g,'<br>');
+    const cta=document.getElementById('nl-cta').value.trim();
+    const ctaUrl=document.getElementById('nl-cta-url').value.trim()||'https://blomsterlen.se';
+
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#FAF7F2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+<div style="max-width:600px;margin:0 auto;padding:20px">
+  <div style="text-align:center;padding:40px 0 32px">
+    <div style="font-family:Georgia,'Times New Roman',serif;font-size:28px;color:#3D3229;letter-spacing:1px;margin-bottom:8px">blomsterlen</div>
+    <div style="width:40px;height:2px;background:#8B9E7E;margin:0 auto"></div>
+  </div>
+  <div style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(61,50,41,.06)">
+    <div style="background:#8B9E7E;padding:32px;text-align:center">
+      <div style="color:#ffffff;font-size:24px;font-family:Georgia,'Times New Roman',serif">${heading}</div>
+    </div>
+    <div style="padding:32px">
+      <div style="color:#3D3229;font-size:15px;line-height:1.8">${body}</div>
+      ${cta?`<div style="text-align:center;margin-top:32px"><a href="${ctaUrl}" style="display:inline-block;background:#8B9E7E;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px">${cta}</a></div>`:''}
+    </div>
+  </div>
+  <div style="text-align:center;padding:32px 0">
+    <div style="margin-bottom:12px"><a href="https://blomsterlen.se" style="color:#8B9E7E;text-decoration:none;font-size:13px">blomsterlen.se</a></div>
+    <div style="color:#b5ada4;font-size:11px;line-height:1.6">Blomsterlen — Perenner från Lackalänga Trädgård<br>Du får detta mail för att du prenumererar på vårt nyhetsbrev.</div>
+  </div>
+</div></body></html>`;
+}
+
+function previewNL(){
+    const html=buildNLHtml();
+    const iframe=document.getElementById('nl-preview');
+    iframe.srcdoc=html;
+}
+
+// Auto-preview on input
+['nl-heading','nl-body','nl-cta','nl-cta-url'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.addEventListener('input',()=>previewNL());
+});
+
+async function sendTestNL(){
+    const subject=document.getElementById('nl-subject').value.trim();
+    if(!subject){toast('Ange en ämnesrad','err');return}
+    const html=buildNLHtml();
+    const st=document.getElementById('nl-status');
+    st.textContent='Skickar testmail till richard@addamig.se…';
+
+    try{
+        const res=await fetch(SUPABASE_URL+'/functions/v1/send-newsletter',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},
+            body:JSON.stringify({subject:'[TEST] '+subject,html,test_email:'richard@addamig.se'})
+        });
+        const data=await res.json();
+        if(data.success){st.innerHTML='<span style="color:var(--ok)">✓ Testmail skickat till richard@addamig.se</span>';toast('Testmail skickat!')}
+        else{st.innerHTML='<span style="color:var(--danger)">✗ '+E(data.error||'Okänt fel')+'</span>';toast(data.error||'Fel','err')}
+    }catch(e){st.innerHTML='<span style="color:var(--danger)">✗ '+E(e.message)+'</span>';toast('Nätverksfel','err')}
+}
+
+async function sendNL(){
+    const subject=document.getElementById('nl-subject').value.trim();
+    const body=document.getElementById('nl-body').value.trim();
+    if(!subject){toast('Ange en ämnesrad','err');return}
+    if(!body){toast('Skriv ett meddelande','err');return}
+
+    // Get count first
+    const{data:subs}=await db.from('newsletter_subscribers').select('id').eq('is_active',true);
+    const cnt=(subs||[]).length;
+    if(cnt===0){toast('Inga aktiva prenumeranter','err');return}
+
+    if(!confirm(`Skicka nyhetsbrevet "${subject}" till ${cnt} prenumeranter?`))return;
+
+    const btn=document.getElementById('nl-send-btn');
+    btn.disabled=true;btn.textContent='Skickar…';
+    const st=document.getElementById('nl-status');
+    st.textContent=`Skickar till ${cnt} mottagare…`;
+
+    try{
+        const res=await fetch(SUPABASE_URL+'/functions/v1/send-newsletter',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},
+            body:JSON.stringify({subject,html:buildNLHtml()})
+        });
+        const data=await res.json();
+        if(data.success){
+            st.innerHTML=`<span style="color:var(--ok)">✓ Skickat till ${data.sent} mottagare!</span>`;
+            toast(`Nyhetsbrev skickat till ${data.sent} mottagare!`);
+        }else{
+            st.innerHTML='<span style="color:var(--danger)">✗ '+(data.error||'Okänt fel')+'</span>';
+            toast(data.error||'Fel vid utskick','err');
+        }
+    }catch(e){st.innerHTML='<span style="color:var(--danger)">✗ '+e.message+'</span>';toast('Nätverksfel','err')}
+
+    btn.disabled=false;btn.textContent='🚀 Skicka till alla';
+}
+
+// Store SUPABASE_URL for edge function calls
+const SUPABASE_URL=SB_URL;
 </script>
 </body>
 </html>
