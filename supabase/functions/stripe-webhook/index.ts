@@ -68,6 +68,65 @@ Deno.serve(async (req) => {
         notes: meta.shipping_note || "",
       };
 
+      // Upsert customer (create or update by email)
+      let customerId: string | null = null;
+      const customerEmail = session.customer_email || "";
+      if (customerEmail) {
+        const nameParts = (meta.customer_name || "").split(" ");
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(" ") || "";
+
+        const { data: existingCustomer } = await supabase
+          .from("customers")
+          .select("id")
+          .eq("email", customerEmail)
+          .maybeSingle();
+
+        if (existingCustomer) {
+          // Update existing customer with latest info
+          customerId = existingCustomer.id;
+          await supabase.from("customers").update({
+            first_name: firstName,
+            last_name: lastName,
+            phone: meta.customer_phone || "",
+            address_line: meta.shipping_address || "",
+            postal_code: meta.shipping_zip || "",
+            city: meta.shipping_city || "",
+            country: "SE",
+            updated_at: new Date().toISOString(),
+          }).eq("id", customerId);
+          console.log("Customer updated:", customerId);
+        } else {
+          // Create new customer
+          const { data: newCustomer, error: custErr } = await supabase
+            .from("customers")
+            .insert({
+              email: customerEmail,
+              first_name: firstName,
+              last_name: lastName,
+              phone: meta.customer_phone || "",
+              address_line: meta.shipping_address || "",
+              postal_code: meta.shipping_zip || "",
+              city: meta.shipping_city || "",
+              country: "SE",
+            })
+            .select("id")
+            .single();
+
+          if (custErr) {
+            console.error("Customer insert failed:", JSON.stringify(custErr));
+          } else {
+            customerId = newCustomer.id;
+            console.log("Customer created:", customerId);
+          }
+        }
+      }
+
+      // Insert order (with customer link)
+      if (customerId) {
+        (orderData as any).customer_id = customerId;
+      }
+
       const { data, error } = await supabase.from("orders").insert(orderData).select();
 
       if (error) {

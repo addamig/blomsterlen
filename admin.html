@@ -160,7 +160,7 @@
 <div class="sec" id="sec-customers">
     <div class="ph"><div class="pt">Kunder <small id="c-cnt"></small></div></div>
     <div class="cb"><input class="si" placeholder="Sök namn, e-post, telefon…" id="c-q" oninput="fC()"></div>
-    <div class="tw"><div class="ts"><table><thead><tr><th>Namn</th><th>E-post</th><th>Telefon</th><th>Adress</th><th>Registrerad</th></tr></thead><tbody id="c-body"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:32px">Inga kunder ännu</td></tr></tbody></table></div>
+    <div class="tw"><div class="ts"><table><thead><tr><th>Namn</th><th>E-post</th><th>Telefon</th><th>Adress</th><th>Ort</th><th>Registrerad</th></tr></thead><tbody id="c-body"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px">Inga kunder ännu</td></tr></tbody></table></div>
     <div class="tf"><span id="c-show"></span><div class="pg" id="c-pg"></div></div></div>
 </div>
 
@@ -440,7 +440,7 @@ function rC(list){
     if(!page.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:32px">Inga kunder</td></tr>';return}
     tb.innerHTML=page.map(c=>{
         const n=c.name||(c.first_name?`${c.first_name} ${c.last_name||''}`:'–');
-        return`<tr><td><span class="np">${E(n)}</span></td><td>${E(c.email||'–')}</td><td>${E(c.phone||'–')}</td><td style="max-width:200px">${E(c.address||c.street||'–')}</td><td>${D(c.created_at)}</td></tr>`;
+        return`<tr><td><span class="np">${E(n)}</span></td><td>${E(c.email||'–')}</td><td>${E(c.phone||'–')}</td><td style="max-width:200px">${E(c.address_line||'–')}</td><td>${E(c.postal_code?c.postal_code+' '+c.city:c.city||'–')}</td><td>${D(c.created_at)}</td></tr>`;
     }).join('');
     PG('c-pg',t,cp,pg=>{cp=pg;rC(list)});
 }
