@@ -5,7 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blomsterlen · Backoffice</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+
+// ═══ NEWSLETTER ═══
+let AN=[],np2=0,nL=false;
+
+async function loadN(){
+    try{const{data,error}=await db.from('newsletter_subscribers').select('*').order('created_at',{ascending:false});if(error)throw error;AN=data||[];nL=true;fN()}catch(e){toast('Nyhetsbrev-fel: '+e.message,'err')}
+}
+
+function fN(){
+    const q=document.getElementById('n-q').value.toLowerCase(),f=document.getElementById('n-f').value;np2=0;
+    rN(AN.filter(n=>{const t=`${n.email||''} ${n.first_name||''}`.toLowerCase();
+        let mf=true;if(f==='active')mf=n.is_active;if(f==='inactive')mf=!n.is_active;
+        return(!q||t.includes(q))&&mf}));
+}
+
+function rN(list){
+    const s=np2*PS,page=list.slice(s,s+PS),t=list.length;
+    document.getElementById('n-cnt').textContent=`(${t})`;
+    document.getElementById('n-show').textContent=t?`${s+1}–${Math.min(s+PS,t)} av ${t}`:'';
+    const tb=document.getElementById('n-body');
+    if(!page.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px">Inga prenumeranter</td></tr>';return}
+    tb.innerHTML=page.map(n=>`<tr>
+        <td><span class="np">${E(n.email)}</span></td>
+        <td>${E(n.first_name||'–')}</td>
+        <td><span class="badge b-n">${E(n.source||'–')}</span></td>
+        <td>${n.is_active?'<span class="badge b-ok">Aktiv</span>':'<span class="badge b-bad">Avprenumererad</span>'}</td>
+        <td>${D(n.subscribed_at||n.created_at)}</td>
+        <td><div class="ac">
+            <button class="ab" onclick="toggleN('${n.id}',${n.is_active})" title="${n.is_active?'Avprenumerera':'Återaktivera'}">${n.is_active?'⏸':'▶️'}</button>
+            <button class="ab del" onclick="delN('${n.id}','${E(n.email)}')" title="Ta bort">🗑</button>
+        </div></td>
+    </tr>`).join('');
+    PG('n-pg',t,np2,pg=>{np2=pg;rN(list)});
+}
+
+function openNM(){
+    document.getElementById('nm-title').textContent='Ny prenumerant';
+    document.getElementById('nm-id').value='';
+    document.getElementById('nm-e').value='';
+    document.getElementById('nm-fn').value='';
+    document.getElementById('nm-src').value='manual';
+    document.getElementById('nm-modal').classList.add('on');
+}
+
+async function saveN(){
+    const email=document.getElementById('nm-e').value.trim();
+    if(!email){toast('E-post krävs','err');return}
+    const d={email,first_name:document.getElementById('nm-fn').value.trim()||null,source:document.getElementById('nm-src').value};
+    try{
+        const{error}=await db.from('newsletter_subscribers').insert(d);
+        if(error)throw error;
+        toast('Prenumerant tillagd');closeM('nm-modal');nL=false;await loadN();refreshAll();
+    }catch(e){toast(e.message.includes('duplicate')?'E-posten finns redan':'Fel: '+e.message,'err')}
+}
+
+async function toggleN(id,current){
+    try{
+        const upd=current?{is_active:false,unsubscribed_at:new Date().toISOString()}:{is_active:true,unsubscribed_at:null};
+        const{error}=await db.from('newsletter_subscribers').update(upd).eq('id',id);
+        if(error)throw error;
+        toast(current?'Avprenumererad':'Återaktiverad');nL=false;await loadN();
+    }catch(e){toast('Fel: '+e.message,'err')}
+}
+
+async function delN(id,email){
+    if(!confirm('Ta bort '+email+'?'))return;
+    try{const{error}=await db.from('newsletter_subscribers').delete().eq('id',id);if(error)throw error;toast('Borttagen');nL=false;await loadN();refreshAll()}catch(e){toast('Fel: '+e.message,'err')}
+}
+</script>
     <style>
         :root{--bg:#0f110f;--bg-card:#181a18;--bg-hover:#1e211e;--bg-input:#1c1f1c;--border:#2a2d2a;--border-focus:#4a7c59;--text:#e8e6e1;--dim:#8a8880;--muted:#5a5850;--accent:#5b9a6a;--accent-h:#6db47e;--accent-bg:rgba(91,154,106,.1);--danger:#c45c5c;--danger-bg:rgba(196,92,92,.1);--warn:#c4a35c;--warn-bg:rgba(196,163,92,.1);--ok:#5b9a6a;--ok-bg:rgba(91,154,106,.15);--r:8px;--rl:12px}
         *{margin:0;padding:0;box-sizing:border-box}
@@ -114,6 +183,7 @@
         <div class="nav-item" data-s="orders" onclick="nav('orders')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><span>Ordrar</span><span class="nav-badge" id="bo">–</span></div>
         <div class="nav-item" data-s="customers" onclick="nav('customers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Kunder</span><span class="nav-badge" id="bc">–</span></div>
         <div class="nav-item" data-s="stock" onclick="nav('stock')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg><span>Lagersaldo</span></div>
+        <div class="nav-item" data-s="newsletter" onclick="nav('newsletter')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>Nyhetsbrev</span><span class="nav-badge" id="bn">–</span></div>
     </div>
     <div class="side-foot"><button onclick="logout()">Logga ut</button></div>
 </nav>
@@ -173,8 +243,34 @@
     </div>
     <div class="tw"><div class="ts"><table><thead><tr><th>Produkt</th><th>Kategori</th><th>Antal</th><th style="width:220px">Justera</th></tr></thead><tbody id="st-body"><tr><td colspan="4" class="ld"><div class="sp"></div>Laddar…</td></tr></tbody></table></div></div>
 </div>
+
+<!-- NEWSLETTER -->
+<div class="sec" id="sec-newsletter">
+    <div class="ph"><div class="pt">Nyhetsbrev <small id="n-cnt"></small></div></div>
+    <div class="cb">
+        <input class="si" placeholder="Sök e-post, namn…" id="n-q" oninput="fN()">
+        <select id="n-f" onchange="fN()"><option value="">Alla</option><option value="active">Aktiva</option><option value="inactive">Avprenumererade</option></select>
+        <button class="btn btn-p" onclick="openNM()">+ Lägg till</button>
+    </div>
+    <div class="tw"><div class="ts"><table>
+        <thead><tr><th>E-post</th><th>Namn</th><th>Källa</th><th>Status</th><th>Prenumererad</th><th style="width:100px"></th></tr></thead>
+        <tbody id="n-body"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px">Inga prenumeranter ännu</td></tr></tbody>
+    </table></div>
+    <div class="tf"><span id="n-show"></span><div class="pg" id="n-pg"></div></div>
+    </div>
 </div>
 </div>
+</div>
+
+<!-- NEWSLETTER MODAL -->
+<div class="mo" id="nm-modal"><div class="md" style="max-width:420px"><h3 id="nm-title">Ny prenumerant</h3>
+<input type="hidden" id="nm-id">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div class="fi"><label>E-post</label><input id="nm-e" type="email" placeholder="namn@example.se"></div>
+<div class="fi"><label>Förnamn (valfritt)</label><input id="nm-fn"></div>
+<div class="fi"><label>Källa</label><select id="nm-src"><option value="manual">Manuell</option><option value="website">Webbplats</option><option value="checkout">Kassa</option></select></div>
+</div>
+<div class="ma"><button class="btn btn-s" onclick="closeM('nm-modal')">Avbryt</button><button class="btn btn-p" onclick="saveN()">Spara</button></div></div></div>
 
 <!-- PRODUCT MODAL -->
 <div class="mo" id="pm-modal"><div class="md"><h3 id="pm-title">Ny produkt</h3><div class="fg">
@@ -226,7 +322,7 @@ function nav(n){
     document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('on'));
     document.getElementById('sec-'+n)?.classList.add('on');
     document.querySelector(`.nav-item[data-s="${n}"]`)?.classList.add('on');
-    if(n==='products'&&!pL)loadP();if(n==='orders'&&!oL)loadO();if(n==='customers'&&!cL)loadC();if(n==='stock')loadStock();
+    if(n==='products'&&!pL)loadP();if(n==='orders'&&!oL)loadO();if(n==='customers'&&!cL)loadC();if(n==='stock')loadStock();if(n==='newsletter'&&!nL)loadN();
 }
 
 function toast(m,t='ok'){const e=document.createElement('div');e.className=`toast t-${t}`;e.textContent=m;document.getElementById('toasts').appendChild(e);setTimeout(()=>e.remove(),4000)}
@@ -269,6 +365,10 @@ async function refreshAll(){
         const cl=(custs||[]).length;
         document.getElementById('s-c').textContent=cl;
         document.getElementById('bc').textContent=cl;
+
+        const{data:subs}=await db.from('newsletter_subscribers').select('id,is_active');
+        const sl=(subs||[]).length;const sa=(subs||[]).filter(s=>s.is_active).length;
+        document.getElementById('bn').textContent=sa;
 
         const rev=ol.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+(o.total_incl_vat||0),0);
         document.getElementById('s-r').textContent=F(rev);
@@ -478,6 +578,75 @@ async function setSt(id,v){
     const n=Math.max(0,parseInt(v)||0);
     try{const{error}=await db.from('products').update({stock_quantity:n}).eq('id',id);if(error)throw error;
     const p=SP.find(x=>x.id===id);if(p)p.stock_quantity=n;fS();toast(`Lager: ${n} st`)}catch(e){toast('Fel: '+e.message,'err')}
+}
+
+
+// ═══ NEWSLETTER ═══
+let AN=[],np2=0,nL=false;
+
+async function loadN(){
+    try{const{data,error}=await db.from('newsletter_subscribers').select('*').order('created_at',{ascending:false});if(error)throw error;AN=data||[];nL=true;fN()}catch(e){toast('Nyhetsbrev-fel: '+e.message,'err')}
+}
+
+function fN(){
+    const q=document.getElementById('n-q').value.toLowerCase(),f=document.getElementById('n-f').value;np2=0;
+    rN(AN.filter(n=>{const t=`${n.email||''} ${n.first_name||''}`.toLowerCase();
+        let mf=true;if(f==='active')mf=n.is_active;if(f==='inactive')mf=!n.is_active;
+        return(!q||t.includes(q))&&mf}));
+}
+
+function rN(list){
+    const s=np2*PS,page=list.slice(s,s+PS),t=list.length;
+    document.getElementById('n-cnt').textContent=`(${t})`;
+    document.getElementById('n-show').textContent=t?`${s+1}–${Math.min(s+PS,t)} av ${t}`:'';
+    const tb=document.getElementById('n-body');
+    if(!page.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px">Inga prenumeranter</td></tr>';return}
+    tb.innerHTML=page.map(n=>`<tr>
+        <td><span class="np">${E(n.email)}</span></td>
+        <td>${E(n.first_name||'–')}</td>
+        <td><span class="badge b-n">${E(n.source||'–')}</span></td>
+        <td>${n.is_active?'<span class="badge b-ok">Aktiv</span>':'<span class="badge b-bad">Avprenumererad</span>'}</td>
+        <td>${D(n.subscribed_at||n.created_at)}</td>
+        <td><div class="ac">
+            <button class="ab" onclick="toggleN('${n.id}',${n.is_active})" title="${n.is_active?'Avprenumerera':'Återaktivera'}">${n.is_active?'⏸':'▶️'}</button>
+            <button class="ab del" onclick="delN('${n.id}','${E(n.email)}')" title="Ta bort">🗑</button>
+        </div></td>
+    </tr>`).join('');
+    PG('n-pg',t,np2,pg=>{np2=pg;rN(list)});
+}
+
+function openNM(){
+    document.getElementById('nm-title').textContent='Ny prenumerant';
+    document.getElementById('nm-id').value='';
+    document.getElementById('nm-e').value='';
+    document.getElementById('nm-fn').value='';
+    document.getElementById('nm-src').value='manual';
+    document.getElementById('nm-modal').classList.add('on');
+}
+
+async function saveN(){
+    const email=document.getElementById('nm-e').value.trim();
+    if(!email){toast('E-post krävs','err');return}
+    const d={email,first_name:document.getElementById('nm-fn').value.trim()||null,source:document.getElementById('nm-src').value};
+    try{
+        const{error}=await db.from('newsletter_subscribers').insert(d);
+        if(error)throw error;
+        toast('Prenumerant tillagd');closeM('nm-modal');nL=false;await loadN();refreshAll();
+    }catch(e){toast(e.message.includes('duplicate')?'E-posten finns redan':'Fel: '+e.message,'err')}
+}
+
+async function toggleN(id,current){
+    try{
+        const upd=current?{is_active:false,unsubscribed_at:new Date().toISOString()}:{is_active:true,unsubscribed_at:null};
+        const{error}=await db.from('newsletter_subscribers').update(upd).eq('id',id);
+        if(error)throw error;
+        toast(current?'Avprenumererad':'Återaktiverad');nL=false;await loadN();
+    }catch(e){toast('Fel: '+e.message,'err')}
+}
+
+async function delN(id,email){
+    if(!confirm('Ta bort '+email+'?'))return;
+    try{const{error}=await db.from('newsletter_subscribers').delete().eq('id',id);if(error)throw error;toast('Borttagen');nL=false;await loadN();refreshAll()}catch(e){toast('Fel: '+e.message,'err')}
 }
 </script>
 </body>
