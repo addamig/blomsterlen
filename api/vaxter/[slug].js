@@ -1,6 +1,4 @@
 const https = require('https');
-const fs = require('fs');
-const path = require('path');
 
 const SUPABASE_URL = 'https://jymaudfvcfhmjnfxucbk.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_tU8OQHV4z23BnM17a_QHtg_is4UE_jr';
@@ -40,13 +38,20 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // Read the template HTML
+  // Read the template HTML via HTTP (static files aren't on filesystem in serverless)
   let html;
   try {
-    html = fs.readFileSync(path.join(__dirname, '..', 'produkt.html'), 'utf8');
+    const host = req.headers.host || 'blomsterlen.se';
+    html = await new Promise((resolve, reject) => {
+      https.get(`https://${host}/produkt.html`, (r) => {
+        let data = '';
+        r.on('data', chunk => data += chunk);
+        r.on('end', () => resolve(data));
+      }).on('error', reject);
+    });
   } catch (e) {
     res.writeHead(500, { 'Content-Type': 'text/plain' });
-    res.end('Template not found');
+    res.end('Template fetch error: ' + e.message);
     return;
   }
 
