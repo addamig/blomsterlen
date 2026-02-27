@@ -66,17 +66,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Send via Resend in batches of 50
-    const batchSize = 50;
+    // Send via Resend individually to each recipient
     let totalSent = 0;
     const errors: string[] = [];
 
-    for (let i = 0; i < recipients.length; i += batchSize) {
-      const batch = recipients.slice(i, i + batchSize);
-
-      // Resend supports batch sending with BCC
-      // But for proper per-recipient tracking, send individually
-      // For simplicity and Resend free tier limits, we use BCC batching
+    for (let i = 0; i < recipients.length; i++) {
       try {
         const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
@@ -86,8 +80,7 @@ Deno.serve(async (req) => {
           },
           body: JSON.stringify({
             from: "Blomsterlen <nyhetsbrev@blomsterlen.se>",
-            to: batch.length === 1 ? batch : [batch[0]],
-            bcc: batch.length > 1 ? batch.slice(1) : undefined,
+            to: [recipients[i]],
             reply_to: "richard@addamig.se",
             subject,
             html,
@@ -96,19 +89,19 @@ Deno.serve(async (req) => {
 
         const result = await res.json();
         if (res.ok) {
-          totalSent += batch.length;
+          totalSent++;
         } else {
-          console.error("Resend batch error:", JSON.stringify(result));
-          errors.push(`Batch ${i / batchSize + 1}: ${result.message || "Unknown error"}`);
+          console.error("Resend error for", recipients[i], ":", JSON.stringify(result));
+          errors.push(`${recipients[i]}: ${result.message || "Unknown error"}`);
         }
       } catch (err) {
-        console.error("Send error:", err.message);
-        errors.push(`Batch ${i / batchSize + 1}: ${err.message}`);
+        console.error("Send error for", recipients[i], ":", err.message);
+        errors.push(`${recipients[i]}: ${err.message}`);
       }
 
-      // Small delay between batches to respect rate limits
-      if (i + batchSize < recipients.length) {
-        await new Promise((r) => setTimeout(r, 1000));
+      // Small delay between sends to respect rate limits
+      if (i < recipients.length - 1) {
+        await new Promise((r) => setTimeout(r, 200));
       }
     }
 
