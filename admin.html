@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blomsterlen · Backoffice</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+
+async function delSend(id,subj){
+    if(!confirm('Ta bort utskicket "'+subj+'"?'))return;
+    try{const{error}=await db.from('newsletter_sends').delete().eq('id',id);if(error)throw error;toast('Borttaget');loadSendHistory()}catch(e){toast('Fel: '+e.message,'err')}
+}
+</script>
 <style>
         :root{--bg:#0f110f;--bg-card:#181a18;--bg-hover:#1e211e;--bg-input:#1c1f1c;--border:#2a2d2a;--border-focus:#4a7c59;--text:#e8e6e1;--dim:#8a8880;--muted:#5a5850;--accent:#5b9a6a;--accent-h:#6db47e;--accent-bg:rgba(91,154,106,.1);--danger:#c45c5c;--danger-bg:rgba(196,92,92,.1);--warn:#c4a35c;--warn-bg:rgba(196,163,92,.1);--ok:#5b9a6a;--ok-bg:rgba(91,154,106,.15);--r:8px;--rl:12px}
         *{margin:0;padding:0;box-sizing:border-box}
@@ -831,7 +837,7 @@ function renderSendHistory(){
             <td>${s.recipient_count} st</td>
             <td>${st}</td>
             <td>${D(s.sent_at)}</td>
-            <td><button class="ab" onclick="previewSent('${s.id}')" title="Visa mail">👁</button></td>
+            <td><div class="ac"><button class="ab" onclick="previewSent('${s.id}')" title="Visa mail">👁</button><button class="ab del" onclick="delSend('${s.id}','${E(s.subject)}')" title="Ta bort">🗑</button></div></td>
         </tr>`;
     }).join('');
 }
@@ -842,6 +848,12 @@ function previewSent(id){
     const iframe=document.getElementById('nl-preview');
     if(iframe)iframe.srcdoc=s.html;
     toast('Visar: '+s.subject);
+}
+
+
+async function delSend(id,subj){
+    if(!confirm('Ta bort utskicket "'+subj+'"?'))return;
+    try{const{error}=await db.from('newsletter_sends').delete().eq('id',id);if(error)throw error;toast('Borttaget');loadSendHistory()}catch(e){toast('Fel: '+e.message,'err')}
 }
 </script>
 </body>
