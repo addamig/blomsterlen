@@ -825,9 +825,9 @@ function renderSendHistory(){
     const tb=document.getElementById('sh-body');
     if(!sendHistory.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Inga utskick ännu</td></tr>';return}
     tb.innerHTML=sendHistory.map(s=>{
-        const st=s.status==='sent'?'<span class="badge b-ok">Skickat</span>':s.status==='partial'?'<span class="badge b-warn">Delvis</span>':'<span class="badge b-n">'+E(s.status)+'</span>';
+        const st=s.status==='sent'?'<span class="badge b-ok">Skickat</span>':s.status==='partial'?'<span class="badge b-warn" style="cursor:pointer" title="'+(s.errors?E(s.errors):'Okänt fel')+'">Delvis</span>':'<span class="badge b-n">'+E(s.status)+'</span>';
         return`<tr>
-            <td><span class="np">${E(s.subject)}</span></td>
+            <td><span class="np">${E(s.subject)}</span>${s.errors?'<div style="font-size:11px;color:var(--danger);margin-top:4px">'+E(s.errors)+'</div>':''}</td>
             <td>${s.recipient_count} st</td>
             <td>${st}</td>
             <td>${D(s.sent_at)}</td>

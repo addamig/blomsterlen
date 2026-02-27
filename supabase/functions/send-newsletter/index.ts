@@ -113,6 +113,7 @@ Deno.serve(async (req) => {
           html,
           recipient_count: totalSent,
           status: errors.length > 0 ? "partial" : "sent",
+          errors: errors.length > 0 ? errors.join("\n") : null,
           sent_by: "admin",
         });
       } catch (logErr) {
