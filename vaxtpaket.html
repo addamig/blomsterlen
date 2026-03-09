@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Växtpaket — 14 perenner i genomtänkta kombinationer | Blomsterlen</title>
-<meta name="description" content="Köp färdiga växtpaket med 14 perenner. 5 genomtänkta teman: Solrabatten, Skuggparadiset, Fjärilsträdgården, Romantiska Rabatten och Årets Runt. 599 kr per paket.">
+<meta name="description" content="Köp färdiga växtpaket med 14 perenner. 5 genomtänkta teman: Solrabatten, Skuggparadiset, Fjärilsträdgården, Romantiska Rabatten och Årets Runt. Från 930 kr per paket.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://blomsterlen.se/vaxtpaket.html">
 <meta property="og:type" content="website">
@@ -158,7 +158,7 @@ footer{background:var(--earth);color:rgba(250,247,242,.7);padding:64px 48px 36px
 <div class="usp-bar">
   <div class="usp"><div class="icon">🌱</div><div class="title">14 plantor</div><div class="sub">3 sorter per paket</div></div>
   <div class="usp"><div class="icon">📐</div><div class="title">Rabattfärdigt</div><div class="sub">Redo att plantera</div></div>
-  <div class="usp"><div class="icon">🚚</div><div class="title">Fri frakt</div><div class="sub">Varje paket = 599 kr</div></div>
+  <div class="usp"><div class="icon">🚚</div><div class="title">Fri frakt</div><div class="sub">Alla paket över 599 kr</div></div>
 </div>
 
 <div class="pkg-list" id="pkgList"></div>
@@ -197,7 +197,7 @@ const PACKAGES = [
     slug: 'solrabatten', name: 'Solrabatten', subtitle: 'Den soliga drömrabatten', emoji: '☀️',
     color: '#E8A838', colorLight: '#FDF3E0',
     description: 'En klassisk solälskande kombination. Lavendel, stäppsalvia och solhatt ger en blålila-gul färgskala som blommar från juni till september. Perfekt för det soliga läget.',
-    price: 599,
+    price: 930,
     tip: 'Plantera lavendeln längst fram, salvian i mitten och solhatten bak. Klipp ner salvian efter första blomning för en andra omgång!',
     items: [
       { qty: 5, role: 'Kantväxt, doft', name: 'Lavendel', latin: "Lavandula angustifolia 'Hidcote'", slug: 'lavandula-angustifolia-hidcote-liten-kruka', bloom: 'Jul-Aug', height: '30-40', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/lavandula-angustifolia-hidcote-product.webp' },
@@ -208,20 +208,20 @@ const PACKAGES = [
   {
     slug: 'skuggparadiset', name: 'Skuggparadiset', subtitle: 'Lummig elegans i halvskugga', emoji: '🌿',
     color: '#4A8C5C', colorLight: '#E8F5E9',
-    description: 'För den skuggiga delen av trädgården. Funkia, trädgårdsnäva och bergenia skapar lummigt bladverk med blomning från tidig vår till sensommar.',
-    price: 599,
-    tip: 'Bergenian ger vårens första färg redan i april. Nävan blommar hela sommaren utan att klaga. Funkian binder ihop det hela med sina storslagna blad.',
+    description: 'För den skuggiga delen av trädgården. Daggfunkia, flocknäva och bergenia skapar lummigt bladverk med blomning från tidig vår till sensommar.',
+    price: 1010,
+    tip: 'Bergenian ger vårens första färg. Flocknävan är en riktig arbetskarl som blommar hela sommaren. Funkian binder ihop det hela med sina storslagna blågrå blad.',
     items: [
-      { qty: 5, role: 'Bladverk, struktur', name: 'Blåfunkia', latin: "Hosta 'Halcyon'", slug: 'hosta-tardiana-gr-halcyon', bloom: 'Jul-Aug', height: '40-50', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/hosta-tardiana-gr-halcyon-product.webp' },
-      { qty: 5, role: 'Marktäckare, kantväxt', name: 'Trädgårdsnäva', latin: "Geranium 'Azure Rush'", slug: 'geranium-azure-rush', bloom: 'Jun-Sep', height: '25-35', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/geranium-azure-rush-product.webp' },
-      { qty: 4, role: 'Vintergrön struktur', name: 'Hjärtbergenia', latin: "Bergenia cordifolia 'Vinterglöd'", slug: 'bergenia-cordifolia-vinterglöd', bloom: 'Apr-Maj', height: '30-40', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/bergenia-cordifolia-vinterglöd-product.webp' }
+      { qty: 5, role: 'Bladverk, struktur', name: 'Daggfunkia', latin: 'Hosta sieboldiana', slug: 'hosta-sieboldiana', bloom: 'Jul-Aug', height: '40-80', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/hosta-sieboldiana-product.webp' },
+      { qty: 5, role: 'Marktäckare, kantväxt', name: 'Flocknäva', latin: 'Geranium macrorrhizum', slug: 'geranium-macrorrhizum', bloom: 'Jun-Jul', height: '10-30', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/geranium-macrorrhizum-product.webp' },
+      { qty: 4, role: 'Vintergrön struktur', name: 'Hjärtbergenia', latin: "Bergenia 'Rotblum'", slug: 'bergenia-rotblum', bloom: 'Jun-Aug', height: '40-80', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/bergenia-rotblum-product.webp' }
     ]
   },
   {
     slug: 'fjarilstradgarden', name: 'Fjärilsträdgården', subtitle: 'Pollinatörernas paradis', emoji: '🦋',
     color: '#9B59B6', colorLight: '#F3E5F5',
     description: 'Maximal dragningskraft på fjärilar, bin och humlor. Kantnepeta, kärleksört och daglilja ger nektar från försommar ända till senhöst.',
-    price: 599,
+    price: 990,
     tip: 'Klipp ner nepetan efter första blomning — den belönar dig med en andra omgång! Kärleksörten tar över på hösten när de andra trappat ner.',
     items: [
       { qty: 5, role: 'Kantväxt, doftande', name: 'Kantnepeta', latin: 'Nepeta faassenii', slug: 'nepeta-faassenii', bloom: 'Jun-Sep', height: '30-50', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/nepeta-faassenii-product.webp' },
@@ -232,11 +232,11 @@ const PACKAGES = [
   {
     slug: 'romantiska-rabatten', name: 'Romantiska Rabatten', subtitle: 'Cottage-stil i rosa & silver', emoji: '🌸',
     color: '#E07B8B', colorLight: '#FDE8EC',
-    description: 'En drömmigt romantisk plantering i rosa, vitt och silver. Alunrot, flox och lammöron skapar mjuk cottage-känsla med doft och bladfärg.',
-    price: 599,
-    tip: 'Lammöronen som silvergrå matta framför floxens rosa moln — oemotståndligt! Alunrotens mörka blad ger fin kontrast.',
+    description: 'En drömmigt romantisk plantering i rosa, vitt och silver. Lönnalunrot, flox och lammöron skapar mjuk cottage-känsla med doft och bladfärg.',
+    price: 935,
+    tip: 'Lammöronen som silvergrå matta framför floxens rosa moln — oemotståndligt! Alunrotens mörka purpurblad ger fin kontrast.',
     items: [
-      { qty: 5, role: 'Bladfärg, kantväxt', name: 'Alunrot', latin: "Heuchera 'Frosted Violet'", slug: 'heuchera-frosted-violet', bloom: 'Jun-Jul', height: '30-40', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/heuchera-frosted-violet-product.webp' },
+      { qty: 5, role: 'Bladfärg, kantväxt', name: 'Lönnalunrot', latin: "Heuchera villosa 'Palace Purple'", slug: 'heuchera-villosa-palace-purple', bloom: 'Jun-Aug', height: '40-80', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/heuchera-villosa-palace-purple-product.webp' },
       { qty: 5, role: 'Höjd, doft, blickfång', name: 'Höstflox', latin: "Phlox paniculata 'Sweet Summer Candy'", slug: 'phlox-paniculata-sweet-summer-candy-inkrukad-barrot', bloom: 'Jul-Sep', height: '60-80', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/phlox-paniculata-sweet-summer-candy-inkrukad-barrot-product.webp' },
       { qty: 4, role: 'Silvrig marktäckare', name: 'Lammöron', latin: 'Stachys byzantina', slug: 'stachys-byzantina', bloom: 'Jun-Jul', height: '15-25', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/stachys-byzantina-product.webp' }
     ]
@@ -245,12 +245,12 @@ const PACKAGES = [
     slug: 'arets-runt-rabatten', name: 'Årets Runt-rabatten', subtitle: 'Något vackert varje månad', emoji: '🗓️',
     color: '#3E7CB1', colorLight: '#E3F0FA',
     description: 'Maximalt intresse genom hela året. Lungört för våren, rudbeckia för sommaren och prydnadsgräs som ger struktur även på vintern.',
-    price: 599,
-    tip: 'Lungörten blommar redan när de andra knappt vaknat. Gräset håller formen hela vintern och ger liv åt rabatten även i december.',
+    price: 955,
+    tip: 'Lungörten blommar redan när de andra knappt vaknat. Gräsets spikklubbeliknande frön ger karaktär hela vintern.',
     items: [
-      { qty: 5, role: 'Tidig vårblomning', name: 'Brokbladig lungört', latin: "Pulmonaria 'Opal'", slug: 'pulmonaria-opal', bloom: 'Apr-Maj', height: '25-30', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/pulmonaria-opal-product.webp' },
+      { qty: 5, role: 'Tidig vårblomning', name: 'Fläckig lungört', latin: "Pulmonaria 'Sissinghurst White'", slug: 'pulmonaria-sissinghurst-white', bloom: 'Jun-Aug', height: '40-80', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/pulmonaria-sissinghurst-white-product.webp' },
       { qty: 5, role: 'Sommar–höstblomning', name: 'Stjärnrudbeckia', latin: 'Rudbeckia fulgida deamii', slug: 'rudbeckia-fulgida-deamii', bloom: 'Jul-Okt', height: '50-60', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/rudbeckia-fulgida-deamii-product.webp' },
-      { qty: 4, role: 'Vintergrön struktur', name: 'Japansk starr', latin: "Carex morrowii 'Ice Dance'", slug: 'carex-morrowii-ice-dance', bloom: 'Vintergrönt', height: '25-35', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/carex-morrowii-ice-dance-product.webp' }
+      { qty: 4, role: 'Vintergrön struktur', name: 'Spikklubbestarr', latin: 'Carex grayi', slug: 'carex-grayi', bloom: 'Jul-Okt', height: '40-80', img: 'https://jymaudfvcfhmjnfxucbk.supabase.co/storage/v1/object/public/product-images/plants/carex-grayi-product.webp' }
     ]
   }
 ];
