@@ -124,7 +124,7 @@ footer{background:var(--earth);color:rgba(250,247,242,.7);padding:64px 48px 36px
 <body>
 <div class="ann">Fri frakt på beställningar över 599 kr — <span>Växter från utvalda svenska odlare</span></div>
 <nav><div class="ni">
-<div class="nl"><a href="index.html#categories">Kategorier</a><a href="index.html#products">Alla växter</a><a href="om-oss.html">Om oss</a><a href="kundservice.html" class="active">Kundservice</a></div>
+<div class="nl"><a href="index.html#categories">Kategorier</a><a href="index.html#products">Alla växter</a><a href="vaxtpaket.html">Växtpaket</a><a href="om-oss.html">Om oss</a><a href="kundservice.html" class="active">Kundservice</a></div>
 <a href="index.html" class="logo">Blomster<em>len</em></a>
 <div class="na"><a href="index.html#products">Handla</a></div>
 </div></nav>
@@ -257,4 +257,6 @@ footer{background:var(--earth);color:rgba(250,247,242,.7);padding:64px 48px 36px
 
 <div class="notif" id="notif"><span style="color:var(--sl)">✓</span><span id="nT"></span></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-dec
+<script>const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis')})},{threshold:.1});document.querySelectorAll('.fade').forEach(el=>obs.observe(el));</script>
+</body>
+</html>
